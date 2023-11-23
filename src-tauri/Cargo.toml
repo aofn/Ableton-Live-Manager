@@ -1,5 +1,5 @@
 [package]
-name = "Ableton Live Manager"
+name = "Ableton-Live-Manager"
 version = "0.1.0"
 description = "Software to manage Ableton Live projects"
 authors = ["Marcel Haupt"]
