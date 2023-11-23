@@ -1,0 +1,4 @@
+[submodule "fix-path-env-rs"]
+	path = fix-path-env-rs
+	url = https://github.com/tauri-apps/fix-path-env-rs.git
+	branch = release
