@@ -1,10 +1,10 @@
 [package]
-name = "Ableton-Live-Manager"
+name = "app"
 version = "0.1.0"
-description = "Software to manage Ableton Live projects"
-authors = ["Marcel Haupt"]
-license = "GPL-3"
-repository = "https://github.com/aofn/Ableton-Live-Manager"
+description = "A Tauri App"
+authors = ["you"]
+license = ""
+repository = ""
 default-run = "app"
 edition = "2021"
 rust-version = "1.60"
