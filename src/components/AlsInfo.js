@@ -4,22 +4,14 @@ import { useTranslation } from "react-i18next";
 import { useEffect, useState } from "react";
 import _ from "lodash";
 import { findDeep } from "@/utils";
-import {
-  BaseDirectory,
-  readBinaryFile,
-  writeTextFile,
-} from "@tauri-apps/api/fs";
+import { readBinaryFile, writeTextFile } from "@tauri-apps/api/fs";
 import Ableton from "@/lib/Ableton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import TrackDetails from "@/components/TrackDetails";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Table, TableBody, TableCaption } from "@/components/ui/table";
 import DisplayThirdPartyPlugins from "@/components/DisplayThirdPartyPlugins";
-import { CardDescription } from "@/components/ui/card";
 import { Cross2Icon } from "@radix-ui/react-icons";
 import { Separator } from "@/components/ui/separator";
-import xml2js from "xml2js";
-import * as xmlJs from "xml-js";
 
 /**
  * Displays the details of an Ableton project.
@@ -178,6 +170,9 @@ const AlsInfo = ({
         </TabsTrigger>
         <TabsTrigger disabled={!projectObject} value="thirdPartyPlugins">
           {t("Third Party Plugins")}
+        </TabsTrigger>
+        <TabsTrigger disabled={!projectObject} value="pitch">
+          {t("Change key")}
         </TabsTrigger>
         <TabsTrigger
           className="ml-auto"
