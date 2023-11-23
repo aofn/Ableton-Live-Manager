@@ -55,8 +55,9 @@ _Important: If you delete this file, all notes and tags of this project will be 
 
 So far the application has only been tested on MacOs Sonoma!
 
-![apple-fill](https://github.com/aofn/Ableton-Live-Manager/assets/79279756/5cc79776-03fa-4cc9-aeb3-3d11775f109e) [Download for Mac](https://github.com/aofn/Ableton-Live-Manager/releases/download/app-v0.5.2/Ableton.Live.Manager_0.5.2_x64.dmg)
-![windows-fill](https://github.com/aofn/Ableton-Live-Manager/assets/79279756/412940a8-0564-47ee-8a38-18e1d37f6c23) [Download for Windows](https://github.com/aofn/Ableton-Live-Manager/releases/download/app-v0.5.2/Ableton.Live.Manager_0.5.2_x64-setup.exe)
+🍏 [Download for Mac](https://github.com/aofn/Ableton-Live-Manager/releases/download/app-v0.5.2/Ableton.Live.Manager_0.5.2_x64.dmg)
+![windows-fill](https://github.com/aofn/Ableton-Live-Manager/assets/79279756/412940a8-0564-47ee-8a38-18e1d37f6c23) 
+🪟 [Download for Windows](https://github.com/aofn/Ableton-Live-Manager/releases/download/app-v0.5.2/Ableton.Live.Manager_0.5.2_x64-setup.exe)
 
 You can find all releases here: https://github.com/aofn/Ableton-Live-Manager/releases/tag/app-v0.5.2
 
