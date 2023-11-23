@@ -1,18 +1,10 @@
 "use client";
 
 import { useTranslation } from "react-i18next";
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "@/components/ui/sheet";
 import ReadDirectory from "@/components/ReadDirectory";
 import {
   Table,
   TableBody,
-  TableCaption,
   TableCell,
   TableHead,
   TableHeader,
@@ -146,22 +138,5 @@ const Settings = ({
       </MenubarMenu>
     </Menubar>
   );
-
-  //
-  // <Sheet >
-  //     <SheetTrigger><GearIcon width="24px" height="24px" /> </SheetTrigger>
-  //     <SheetContent side="left" className="w-[800px]">
-  //         <SheetHeader>
-  //             <SheetTitle>{t('Settings')}</SheetTitle>
-  //         </SheetHeader>
-  //         <div className="flex flex-col">
-  //         <ReadDirectory
-  //             projectDirectory={projectDirectory}
-  //             setProjectDirectory={setProjectDirectory}
-  //         />
-  //         <RemoveTags config={config} projectDirectory={projectDirectory}/>
-  //         </div>
-  //     </SheetContent>
-  // </Sheet>
 };
 export default Settings;

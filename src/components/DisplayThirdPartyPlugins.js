@@ -4,7 +4,6 @@ import { useTranslation } from "react-i18next";
 import {
   Table,
   TableBody,
-  TableCaption,
   TableCell,
   TableHead,
   TableHeader,
@@ -14,8 +13,6 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 
 import { useState } from "react";
-import _ from "lodash";
-import { findDeep } from "@/utils";
 import {
   Dialog,
   DialogContent,
