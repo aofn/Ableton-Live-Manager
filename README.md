@@ -1,6 +1,7 @@
 # Ableton Live Project Manager
 
 This project is a tool designed to help manage Ableton Live projects.
+![alm-example](https://github.com/marcel-klasse/Ableton-Live-Manager/assets/79279756/bbb852f7-ffaa-442e-a7c1-ec549a534c94)
 
 ## Features
 
