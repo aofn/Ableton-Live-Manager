@@ -6,7 +6,7 @@ authors = ["Marcel Haupt"]
 license = "GPL-3"
 repository = "https://github.com/aofn/Ableton-Live-Manager"
 default-run = "app"
-edition = "2023"
+edition = "2021"
 rust-version = "1.60"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
