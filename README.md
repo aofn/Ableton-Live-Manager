@@ -59,7 +59,7 @@ _Important: If you delete this file, all notes and tags of this project will be 
 
 ## Development
 
-1. Clone the repository: `git clone https://github.com/marcel-klasse/ableton-live-manager`
+1. Clone the repository: `git clone https://github.com/aofn/ableton-live-manager`
 2. Navigate into the project directory: `cd ableton-live-project-manager`
 3. Install the dependencies: `npm install`
 4. Run the Tauri application: `npm run tauri dev`
