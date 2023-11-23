@@ -53,19 +53,21 @@ _Important: If you delete this file, all notes and tags of this project will be 
 
 ## Usage
 
-So far the application has only been tested on MacOs Sonoma!
+So far the application has only been tested on macOS Sonoma!
 
-🍏 [Download for Mac](https://github.com/aofn/Ableton-Live-Manager/releases/download/app-v0.5.2/Ableton.Live.Manager_0.5.2_x64.dmg)
-![windows-fill](https://github.com/aofn/Ableton-Live-Manager/assets/79279756/412940a8-0564-47ee-8a38-18e1d37f6c23) 
+🍏 [Download for macOS](https://github.com/aofn/Ableton-Live-Manager/releases/download/app-v0.5.2/Ableton.Live.Manager_0.5.2_x64.dmg)
 🪟 [Download for Windows](https://github.com/aofn/Ableton-Live-Manager/releases/download/app-v0.5.2/Ableton.Live.Manager_0.5.2_x64-setup.exe)
 
 You can find all releases here: https://github.com/aofn/Ableton-Live-Manager/releases/tag/app-v0.5.2
 
-
-
 1. Download the application.
-3. Go to settings and set the directory path where your Ableton Live projects are located.
-4. The application will scan the directory and display all Ableton Live project files.
+2. On macOS, drag the application in your 'Applications' folder.
+3. Open Finder navigate to your 'Applications' folder
+4. Right-click on the app and select "open". (or hold down 'control' and click on the app)
+5. Inside the app click on 'Ableton Live Manager' and choose 'Change Ableton Project Folder'
+6. Navigate to your Ableton Project folder and select it
+7. The application will now scan the directory and display all Ableton Live projects.
+8. You're good to go!
 
 ## Development
 
@@ -79,7 +81,9 @@ THe project uses Tailwind CSS and shadecn/ui as a UI framework. You can find the
 
 ## Contributing
 
-Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
+If you want to help develop the project, pull requests are very welcome. 
+For major changes, please open an issue or a discussion first to discuss what you would like to change.
+The project was written with Tauri and React (NextJS).
 
 ## Buy me a coffee
 
