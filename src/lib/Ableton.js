@@ -1,13 +1,15 @@
 import xml2js from "xml2js";
 import pako from "pako";
-import { writeTextFile } from "@tauri-apps/api/fs";
-import xml2json from "xml-js";
 import * as xmlJs from "xml-js";
 
 class Ableton {
   UnpackAndCreatJson(xml, OnLoaded, OnError, Original) {
     const parsed = pako.ungzip(xml, { to: "string" });
-    let parser = new xml2js.Parser({ mergeAttrs: true, explicitArray: false });
+    let parser = new xml2js.Parser({
+      mergeAttrs: true,
+      explicitArray: false,
+      sanitize: false,
+    });
     const jsonData = xmlJs.xml2json(parsed);
 
     Original(JSON.parse(jsonData));
@@ -17,7 +19,6 @@ class Ableton {
         OnLoaded(result);
       } else {
         OnError(err);
-        return;
       }
     });
   }
@@ -57,8 +58,22 @@ class Ableton {
       }
     };
 
+    // This is needed in order to not create corrupted files:
+    // https://github.com/nashwaan/xml-js/issues/26
+    const encodeHTML = function (attributeValue) {
+      return attributeValue
+        .replace(/&quot;/g, '"') // convert quote back before converting amp
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&apos;");
+    };
+
     searchAndRemove(obj);
-    return xmlJs.json2xml(obj);
+    return xmlJs.json2xml(obj, {
+      attributeValueFn: encodeHTML,
+    });
   }
 }
 
