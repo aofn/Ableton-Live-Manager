@@ -61,7 +61,7 @@
         "icons/icon.icns",
         "icons/icon.ico"
       ],
-      "identifier": "com.johndarque",
+      "identifier": "com.anoldfrenchname",
       "longDescription": "",
       "macOS": {
         "entitlements": null,
