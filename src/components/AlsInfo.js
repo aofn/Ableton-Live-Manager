@@ -185,10 +185,11 @@ const AlsInfo = ({
             <p className="py-1">
               {t("BPM:")}
               <span className="px-1">
-                {
-                  projectObject.Ableton.LiveSet.MasterTrack.DeviceChain.Mixer
-                    .Tempo.Manual.Value
-                }
+                {projectObject.Ableton.LiveSet?.MasterTrack
+                  ? projectObject.Ableton.LiveSet.MasterTrack.DeviceChain.Mixer
+                      .Tempo.Manual.Value
+                  : projectObject.Ableton.LiveSet.MainTrack.DeviceChain.Mixer
+                      .Tempo.Manual.Value}
               </span>
             </p>
             <p className="py-1">{projectObject?.Ableton.Creator}</p>
