@@ -57,11 +57,11 @@ _Important: If you delete this file, all notes and tags of this project will be 
 
 So far the application has only been tested on macOS Sonoma!
 
-🍏 [Download for macOS](https://github.com/aofn/Ableton-Live-Manager/releases/download/app-v0.5.2/Ableton.Live.Manager_0.5.2_x64.dmg)
+🍏 [Download for macOS](https://github.com/aofn/Ableton-Live-Manager/releases/download/app-v0.5.2/Ableton.Live.Manager_0.6.0_x64.dmg)
 
-🪟 [Download for Windows](https://github.com/aofn/Ableton-Live-Manager/releases/download/app-v0.5.2/Ableton.Live.Manager_0.5.2_x64-setup.exe)
+🪟 [Download for Windows](https://github.com/aofn/Ableton-Live-Manager/releases/download/app-v0.5.2/Ableton.Live.Manager_0.6.0_x64-setup.exe)
 
-You can find all releases here: https://github.com/aofn/Ableton-Live-Manager/releases/tag/app-v0.5.2
+You can find all releases here: https://github.com/aofn/Ableton-Live-Manager/releases/tag/app-v0.6.0
 
 1. Download the application.
 2. On macOS, drag the application in your 'Applications' folder.
