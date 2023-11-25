@@ -59,18 +59,29 @@ So far the application has only been tested on macOS Sonoma!
 
 🍏 [Download for macOS](https://github.com/aofn/Ableton-Live-Manager/releases/download/app-v0.6.0/Ableton.Live.Manager_0.6.0_x64.dmg)
 
-🪟 [Download for Windows](https://github.com/aofn/Ableton-Live-Manager/releases/download/app-v0.6.0/Ableton.Live.Manager_0.6.0_x64-setup.exe)
+🪟 [Download for Windows](https://github.com/aofn/Ableton-Live-Manager/releases/download/app-v0.6.0/Ableton.Live.Manager_0.6.0_x64_en-US.msi)
 
-You can find all releases here: https://github.com/aofn/Ableton-Live-Manager/releases/tag/app-v0.6.0
+You can find all releases here: https://github.com/aofn/Ableton-Live-Manager/releases/tag/app-v0.6.0 
 
-1. Download the application.
-2. On macOS, drag the application in your 'Applications' folder.
+### MacOS
+1. Download the application (.dmg file).
+2. Drag the application in your 'Applications' folder.
 3. Open Finder navigate to your 'Applications' folder
 4. Right-click on the app and select "open". (or hold down 'control' and click on the app)
-5. Inside the app click on 'Ableton Live Manager' and choose 'Change Ableton Project Folder'
-6. Navigate to your Ableton Project folder and select it
-7. The application will now scan the directory and display all Ableton Live projects.
-8. You're good to go!
+5. You will be prompted with a warning that the app is from an unidentified developer. Click on 'Open'.
+6. Inside the app click on 'Ableton Live Manager' and choose 'Change Ableton Project Folder'
+7. Navigate to your Ableton Project folder and select it
+8. The application will now scan the directory and display all Ableton Live projects.
+9. You're good to go!
+
+### Windows
+1. Download the application (use the .msi file, there seems to be a problem with the.exe).
+2. Run the installer.
+3. Open the application.
+4. Inside the app click on 'Ableton Live Manager' and choose 'Change Ableton Project Folder'
+5. Navigate to your Ableton Project folder and select it
+6. The application will now scan the directory and display all Ableton Live projects.
+7. You're good to go!
 
 ## Development
 
