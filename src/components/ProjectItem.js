@@ -8,7 +8,6 @@ import { useTranslation } from "react-i18next";
 
 import { Separator } from "@/components/ui/separator";
 import FolderView from "@/components/FolderView";
-import { readTextFile } from "@tauri-apps/api/fs";
 import { Tags } from "@/components/Tags";
 import { RightColumn } from "@/components/RightColumn";
 import {
@@ -59,27 +58,7 @@ export default function ProjectItem({
 
   useEffect(() => {
     if (project) {
-      // search for notes and alm.json within project folder
-      if (project.children) {
-        const notes = project.children.filter((child) =>
-          child.name.endsWith(".md"),
-        );
-        if (notes.length > 0) setProjectNotesPath(notes[0].path);
-      }
-      const getAlmFile = async () => {
-        console.log("reading alm file");
-        const readFile = await readTextFile(project.path + "/alm.json").catch(
-          (error) => {
-            if (!error.includes("os error 2")) {
-              console.log(error);
-            }
-          },
-        );
-
-        if (!readFile) return;
-        setAlmFile(JSON.parse(readFile));
-      };
-      getAlmFile();
+      setAlmFile(project.alm);
     }
   }, [project]);
 

@@ -1,6 +1,5 @@
 "use client";
 
-import { useTranslation } from "react-i18next";
 import React, { useEffect, useState } from "react";
 import Editor from "@/components/Editor/Editor";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
@@ -20,16 +19,15 @@ const Notes = ({ projectDirectory, projectNotesPath, almFile, setAlmFile }) => {
       }
       setLoading(false);
     };
-    if (projectNotesPath && isMounted) getNotes();
+    if (almFile && isMounted) getNotes();
 
     return () => {
       isMounted = false;
     };
-  }, [projectNotesPath, almFile]);
+  }, [almFile]);
 
   const onSave = async (editedNote) => {
     // if no changes have been made we don't want to do anything
-    console.log(editedNote);
     if (editedNote === notes) return;
     setNotes(editedNote);
     const copyAlm = { ...almFile };
@@ -47,7 +45,7 @@ const Notes = ({ projectDirectory, projectNotesPath, almFile, setAlmFile }) => {
         <LoadingSpinner />
       ) : (
         <>
-          <Editor onSave={onSave} content={almFile.notes} />
+          <Editor onSave={onSave} content={notes} />
         </>
       )}
     </>
