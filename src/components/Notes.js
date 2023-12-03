@@ -7,7 +7,7 @@ import { writeTextFile } from "@tauri-apps/api/fs";
 
 const Notes = ({ projectDirectory, projectNotesPath, almFile, setAlmFile }) => {
   const { t } = useTranslation();
-  const [notes, setNotes] = useState({});
+  const [notes, setNotes] = useState(almFile?.notes || "");
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
