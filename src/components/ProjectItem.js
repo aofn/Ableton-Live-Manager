@@ -42,13 +42,11 @@ export default function ProjectItem({
   filterByTags,
   config,
   setConfig,
-  setProjectDirectory,
   setFilterByTags,
   collapseAll,
 }) {
   const [openDetails, setOpenDetails] = useState(false);
   const { t } = useTranslation();
-  const [projectNotesPath, setProjectNotesPath] = useState("");
   const [almFile, setAlmFile] = useState({});
   const [isAccordionOpen, setIsAccordionOpen] = useState("open");
 
@@ -148,12 +146,7 @@ export default function ProjectItem({
             <FolderView
               project={project}
               almFile={almFile}
-              setAlmFile={setAlmFile}
-              projectNotesPath={projectNotesPath}
               handleOpenProject={handleOpenProject}
-              openDetails={openDetails}
-              setOpenDetails={setOpenDetails}
-              setProjectDirectory={setProjectDirectory}
             />
             <RightColumn
               openDetails={openDetails}
@@ -161,7 +154,6 @@ export default function ProjectItem({
               almFile={almFile}
               setAlmFile={setAlmFile}
               projectDirectory={project.path}
-              projectNotesPath={projectNotesPath}
               setOpenDetails={setOpenDetails}
             />
           </section>

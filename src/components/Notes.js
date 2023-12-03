@@ -5,8 +5,7 @@ import Editor from "@/components/Editor/Editor";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import { writeTextFile } from "@tauri-apps/api/fs";
 
-const Notes = ({ projectDirectory, projectNotesPath, almFile, setAlmFile }) => {
-  const { t } = useTranslation();
+const Notes = ({ projectDirectory, almFile, setAlmFile }) => {
   const [notes, setNotes] = useState(almFile?.notes || "");
   const [loading, setLoading] = useState(false);
 
