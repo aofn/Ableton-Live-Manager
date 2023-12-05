@@ -18,7 +18,6 @@ import Notes from "@/components/Notes";
  */
 export const RightColumn = ({
   projectDirectory,
-  projectNotesPath,
   name,
   openDetails,
   setOpenDetails,
@@ -39,7 +38,6 @@ export const RightColumn = ({
       ) : (
         <Notes
           projectDirectory={projectDirectory}
-          projectNotesPath={projectNotesPath}
           almFile={almFile}
           setAlmFile={setAlmFile}
         />

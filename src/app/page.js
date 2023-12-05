@@ -23,6 +23,7 @@ import {
 import { cn } from "@/lib/utils";
 import { badgeVariants } from "@/components/ui/badge";
 import "remixicon/fonts/remixicon.css";
+import _ from "lodash";
 
 /**
  * Displays a progress bar while scanning the project directory.
@@ -63,6 +64,7 @@ export default function Home() {
   const [config, setConfig] = useState({});
   const [filterByTags, setFilterByTags] = useState([]);
   const [collapseAll, setCollapseAll] = useState(true);
+  const [sortMethod, setSortMethod] = useState([]);
   const { t } = useTranslation();
   const colourStyles = {
     option: (styles, { data, isDisabled, isFocused, isSelected }) => ({
@@ -119,7 +121,6 @@ export default function Home() {
           entries.splice(i, 1);
           continue;
         }
-
         if (entry.children) {
           for (let [i, child] of entry.children.entries()) {
             const isFile = await invoke("is_file", { path: child.path }).catch(
@@ -127,6 +128,13 @@ export default function Home() {
                 entry.children.splice(i, 1);
               },
             );
+            // look for existing alm.json file
+            if (child.path.endsWith("alm.json")) {
+              // add apm object to entry
+              const almFile = await readTextFile(child.path);
+              const almJson = JSON.parse(almFile);
+              entry.alm = almJson;
+            }
 
             if (child.path.endsWith(".als")) {
               setCurrentScanPath(child.name);
@@ -161,6 +169,26 @@ export default function Home() {
 
     getConfig();
   }, []);
+
+  // sort function to sort directoryEntries by tags within alm.tags key if alm key exists
+  const sortByTags = (a, b) => {
+    const aTags = a.alm?.tags ? Object.values(a.alm.tags) : [];
+    const bTags = b.alm?.tags ? Object.values(b.alm.tags) : [];
+
+    const sortedATags = _.sortBy(aTags, ["value", "label"]);
+    const sortedBTags = _.sortBy(bTags, ["value", "label"]);
+
+    const aTagsString = sortedATags.map((tag) => tag.value).join("");
+    const bTagsString = sortedBTags.map((tag) => tag.value).join("");
+
+    // * -1 reverses order so tags are on top of list
+    return aTagsString.localeCompare(bTagsString) * -1;
+  };
+
+  // sort projects by name
+  const sortByName = (a, b) => {
+    return _.sortBy([a, b], ["name"]);
+  };
 
   if (displayProgress)
     return (
@@ -205,6 +233,19 @@ export default function Home() {
             placeholder={t("Filter by tag")}
             options={config.tags ? Object.values(config.tags) : []}
           />
+          <Select
+            onChange={setSortMethod}
+            value={sortMethod}
+            className="my-react-select-container rounded-none border-0 basic-multi-select m-1 min-w-[180px] w-200"
+            classNames={reactSelectClassNames}
+            classNamePrefix="my-react-select"
+            styles={colourStyles}
+            placeholder={t("Sort by")}
+            options={[
+              { value: "name", label: "Name" },
+              { value: "tags", label: "Tags" },
+            ]}
+          />
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger>
@@ -227,6 +268,7 @@ export default function Home() {
             .filter((entry) =>
               entry.name.toLowerCase().includes(filterInput.toLowerCase()),
             )
+            .sort(sortMethod.value === "name" ? sortByName : sortByTags)
             .map((entry) => {
               return (
                 <ProjectItem
