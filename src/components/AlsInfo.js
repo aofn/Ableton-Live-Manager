@@ -171,6 +171,9 @@ const AlsInfo = ({
         <TabsTrigger disabled={!projectObject} value="thirdPartyPlugins">
           {t("Third Party Plugins")}
         </TabsTrigger>
+        <TabsTrigger disabled={!projectObject} value="pitch">
+          {t("Change key")}
+        </TabsTrigger>
         <TabsTrigger
           className="ml-auto"
           onClick={() => onClose()}
