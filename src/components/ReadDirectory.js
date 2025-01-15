@@ -24,12 +24,16 @@ export default function ReadDirectory({
       // user selected a single directory
       setProjectDirectory(selected);
       const copyConfig = { ...config };
-      copyConfig.directoryPath = selected;
+      // add new folder to config folder array
+      if (!copyConfig.folders) {
+        copyConfig.folders = [];
+      }
+      copyConfig.folders.push(selected);
       return writeTextFile(`config.json`, JSON.stringify(copyConfig, null, 2), {
         dir: BaseDirectory.Data,
       });
 
-      localStorage.setItem("ableton-project-directory", selected);
+      // localStorage.setItem("ableton-project-directory", selected);
     }
   };
 
