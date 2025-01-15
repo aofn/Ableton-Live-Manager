@@ -24,6 +24,7 @@ import { cn } from "@/lib/utils";
 import { badgeVariants } from "@/components/ui/badge";
 import "remixicon/fonts/remixicon.css";
 import _ from "lodash";
+import DropZone from "@/components/DropZone";
 
 /**
  * Displays a progress bar while scanning the project directory.
@@ -65,6 +66,7 @@ export default function Home() {
   const [filterByTags, setFilterByTags] = useState([]);
   const [collapseAll, setCollapseAll] = useState(true);
   const [sortMethod, setSortMethod] = useState([]);
+  const [folders, setFolders] = useState([]);
   const { t } = useTranslation();
   const colourStyles = {
     option: (styles, { data, isDisabled, isFocused, isSelected }) => ({
@@ -102,48 +104,56 @@ export default function Home() {
 
   useEffect(() => {
     setProjectDirectory(config?.directoryPath);
+    setFolders(config?.folders);
   }, [config]);
 
   useEffect(() => {
     let isMounted = true;
-    const processEntries = async (path) => {
-      const entries = await readDir(path, { directory: true, recursive: true });
-      setDisplayProgress(true);
-      setTotalScan(entries.length);
-      for (let [i, entry] of entries.entries()) {
-        setCurrentScan(i);
-        const percentage = (i / entries.length) * 100;
-        setProgressTotal(parseInt(percentage));
-        // console.log(entry.path)
-        try {
-          await invoke("is_file", { path: entry.path });
-        } catch {
-          entries.splice(i, 1);
-          continue;
-        }
-        if (entry.children) {
-          for (let [i, child] of entry.children.entries()) {
-            const isFile = await invoke("is_file", { path: child.path }).catch(
-              () => {
-                entry.children.splice(i, 1);
-              },
-            );
-            // look for existing alm.json file
-            if (child.path.endsWith("alm.json")) {
-              // add apm object to entry
-              const almFile = await readTextFile(child.path);
-              const almJson = JSON.parse(almFile);
-              entry.alm = almJson;
-            }
+    if (!projectDirectory.folders) return;
 
-            if (child.path.endsWith(".als")) {
-              setCurrentScanPath(child.name);
+    const processEntries = async (path) => {
+      for (let i = 0; i < folders.length; i++) {
+        const entries = await readDir(path, {
+          directory: true,
+          recursive: true,
+        });
+        setDisplayProgress(true);
+        setTotalScan(entries.length);
+        for (let [i, entry] of entries.entries()) {
+          setCurrentScan(i);
+          const percentage = (i / entries.length) * 100;
+          setProgressTotal(parseInt(percentage));
+          // console.log(entry.path)
+          try {
+            await invoke("is_file", { path: entry.path });
+          } catch {
+            entries.splice(i, 1);
+            continue;
+          }
+          if (entry.children) {
+            for (let [i, child] of entry.children.entries()) {
+              const isFile = await invoke("is_file", {
+                path: child.path,
+              }).catch(() => {
+                entry.children.splice(i, 1);
+              });
+              // look for existing alm.json file
+              if (child.path.endsWith("alm.json")) {
+                // add apm object to entry
+                const almFile = await readTextFile(child.path);
+                const almJson = JSON.parse(almFile);
+                entry.alm = almJson;
+              }
+
+              if (child.path.endsWith(".als")) {
+                setCurrentScanPath(child.name);
+              }
             }
           }
         }
+        setDirectoryEntries(entries);
+        setDisplayProgress(false);
       }
-      setDirectoryEntries(entries);
-      setDisplayProgress(false);
     };
 
     if (projectDirectory && isMounted) {
@@ -169,6 +179,10 @@ export default function Home() {
 
     getConfig();
   }, []);
+
+  const handleFolderDrop = (folderPath) => {
+    setFolders((prevFolders) => [...prevFolders, folderPath]);
+  };
 
   // sort function to sort directoryEntries by tags within alm.tags key if alm key exists
   const sortByTags = (a, b) => {
@@ -284,6 +298,12 @@ export default function Home() {
                 />
               );
             })}
+        <DropZone onFolderDrop={handleFolderDrop} />
+        <ul>
+          {folders.map((folder, index) => (
+            <li key={index}>{folder}</li>
+          ))}
+        </ul>
       </main>
     </>
   );
