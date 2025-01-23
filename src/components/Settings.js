@@ -117,6 +117,7 @@ const Settings = ({
   setProjectDirectory,
   config,
   setConfig,
+  handleAddingFolder,
 }) => {
   const { t } = useTranslation("settings");
 
@@ -132,6 +133,7 @@ const Settings = ({
             config={config}
             setConfig={setConfig}
             setProjectDirectory={setProjectDirectory}
+            handleAddingFolder={handleAddingFolder}
           />
           <RemoveTags config={config} projectDirectory={projectDirectory} />
         </MenubarContent>

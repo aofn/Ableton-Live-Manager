@@ -193,8 +193,30 @@ export default function Home() {
     getConfig();
   }, []);
 
-  const handleFolderDrop = (folderPath) => {
-    setFolders((prevFolders) => [...prevFolders, folderPath]);
+  const handleAddingFolder = async (folderPath) => {
+    const folder = await readDir(folderPath, {
+      recursive: true,
+    });
+
+    const folderObject = {
+      name: folderPath.split("/").pop(),
+      path: folderPath,
+      children: folder.map((entry) => ({
+        name: entry.name,
+        path: entry.path,
+      })),
+    };
+
+    const copyConfig = { ...config };
+    if (!copyConfig.directories) {
+      copyConfig.directories = [];
+    }
+    copyConfig.directories.push(folderObject);
+    setConfig(copyConfig);
+
+    await writeTextFile(`config.json`, JSON.stringify(copyConfig, null, 2), {
+      dir: BaseDirectory.Data,
+    });
   };
 
   // sort function to sort directoryEntries by tags within alm.tags key if alm key exists
@@ -261,9 +283,10 @@ export default function Home() {
             setProjectDirectory={setProjectDirectory}
             setConfig={setConfig}
             config={config}
+            handleAddingFolder={handleAddingFolder}
           />
         </NavigationMenu>
-        <div className="items-end flex justify-items-center items-center py-2 z-50">
+        <div className="flex justify-items-center items-center py-2 z-50">
           <Input
             onChange={(e) => setFilterInput(e.target.value)}
             value={filterInput}
@@ -334,7 +357,7 @@ export default function Home() {
                 />
               );
             })}
-        <DropZone onFolderDrop={handleFolderDrop} />
+        <DropZone onFolderDrop={handleAddingFolder} />
       </main>
     </>
   );
