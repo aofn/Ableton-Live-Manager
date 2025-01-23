@@ -108,56 +108,51 @@ export default function Home() {
   };
 
   useEffect(() => {
-    setProjectDirectory(config?.directoryPath);
+    // setProjectDirectory(config?.directoryPath);
     setFolders(config?.directories);
   }, [config]);
 
   useEffect(() => {
     let isMounted = true;
 
-    if (!folders || folders.length < 0) return;
+    if (!folders || folders.length === 0) return;
 
     const processEntries = async () => {
-      // const projectFolder = await readDir(
-      //   "/Users/marcel/Music/Ableton/Projects/",
-      //   {
-      //     directory: true,
-      //     recursive: true,
-      //   },
-      // );
-      // console.log(projectFolder);
       setDisplayProgress(true);
       setTotalScan(folders.length);
-      // create copy of folders array
-      const copyOfFolders = [...folders];
-      //filter strings from folders array
-      copyOfFolders.filter((entry) => typeof entry === "object");
+
+      const copyOfFolders = [...folders].filter(
+        (entry) => typeof entry === "object",
+      );
+
       for (let [i, entry] of copyOfFolders.entries()) {
         if (!entry.path) continue;
+
         const entries = await readDir(entry.path, {
           directory: true,
           recursive: true,
         });
+
         setCurrentScan(i);
         const percentage = (i / folders.length) * 100;
         setProgressTotal(parseInt(percentage));
-        // console.log(entry.path)
+
         try {
           await invoke("is_file", { path: entry.path });
         } catch {
-          folders.splice(i, 1);
+          copyOfFolders.splice(i, 1);
           continue;
         }
+
         if (entry.children) {
-          for (let [i, child] of entry.children.entries()) {
-            const isFile = await invoke("is_file", {
-              path: child.path,
-            }).catch(() => {
-              entry.children.splice(i, 1);
-            });
-            // look for existing alm.json file
+          for (let [j, child] of entry.children.entries()) {
+            try {
+              const isFile = await invoke("is_file", { path: child.path });
+            } catch {
+              entry.children.splice(j, 1);
+            }
+
             if (child.path.endsWith("alm.json")) {
-              // add apm object to entry
               const almFile = await readTextFile(child.path);
               const almJson = JSON.parse(almFile);
               entry.alm = almJson;
@@ -169,13 +164,14 @@ export default function Home() {
           }
         }
       }
-      setDirectoryEntries(copyOfFolders);
-      setDisplayProgress(false);
+
+      if (isMounted) {
+        setDirectoryEntries(copyOfFolders);
+        setDisplayProgress(false);
+      }
     };
 
-    if (folders && isMounted) {
-      processEntries(folders);
-    }
+    processEntries();
 
     return () => {
       isMounted = false;
@@ -217,21 +213,26 @@ export default function Home() {
   };
 
   const handleDeleteProject = async (projectPath) => {
-    setDirectoryEntries((prevEntries) =>
-      prevEntries.filter((entry) => entry.path !== projectPath),
+    // Update the directoryEntries state
+    console.log(folders);
+    console.log(projectPath);
+    setFolders((prevEntries) =>
+      prevEntries.filter((entry) => entry.path !== projectPath.path),
     );
+
     // Update the config state
     const updatedConfig = {
       ...config,
-      directories: config.directories.filter((dir) => dir.path !== projectPath),
+      directories: config.directories.filter(
+        (dir) => dir.path !== projectPath.path,
+      ),
     };
+
     await writeTextFile("config.json", JSON.stringify(updatedConfig), {
       dir: BaseDirectory.Data,
     });
 
     setConfig(updatedConfig);
-
-    // Save the updated config to the file
   };
 
   // sort projects by name
