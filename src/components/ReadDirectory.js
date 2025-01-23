@@ -4,7 +4,7 @@ import React from "react";
 import { open } from "@tauri-apps/api/dialog";
 import { MenubarItem } from "@/components/ui/menubar";
 import { useTranslation } from "react-i18next";
-import { BaseDirectory, writeTextFile } from "@tauri-apps/api/fs";
+import { BaseDirectory, writeTextFile, readDir } from "@tauri-apps/api/fs";
 export default function ReadDirectory({
   config,
   setConfig,
@@ -12,34 +12,43 @@ export default function ReadDirectory({
 }) {
   const { t } = useTranslation();
   const readDirectory = async () => {
-    // const entries = await readDir('users', {dir: BaseDirectory.AppData, recursive: true});
-    // processEntries(entries)
     const selected = await open({
       directory: true,
       multiple: false,
     });
-    if (selected === null) {
-      // user cancelled the selection
-    } else {
-      // user selected a single directory
+
+    if (selected !== null) {
       setProjectDirectory(selected);
-      const copyConfig = { ...config };
-      // add new folder to config folder array
-      if (!copyConfig.folders) {
-        copyConfig.folders = [];
-      }
-      copyConfig.folders.push(selected);
-      return writeTextFile(`config.json`, JSON.stringify(copyConfig, null, 2), {
-        dir: BaseDirectory.Data,
+
+      const entries = await readDir(selected, {
+        recursive: true,
       });
 
-      // localStorage.setItem("ableton-project-directory", selected);
+      const folderObject = {
+        name: selected.split("/").pop(),
+        path: selected,
+        children: entries.map((entry) => ({
+          name: entry.name,
+          path: entry.path,
+        })),
+      };
+
+      const copyConfig = { ...config };
+      if (!copyConfig.directories) {
+        copyConfig.directories = [];
+      }
+      copyConfig.directories.push(folderObject);
+      setConfig(copyConfig);
+
+      await writeTextFile(`config.json`, JSON.stringify(copyConfig, null, 2), {
+        dir: BaseDirectory.Data,
+      });
     }
   };
 
   return (
     <MenubarItem onClick={readDirectory}>
-      {t("Change Ableton Project Folder")}
+      {t("Add Ableton Project")}
     </MenubarItem>
   );
 }

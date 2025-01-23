@@ -24,7 +24,16 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { AccordionHeader } from "@radix-ui/react-accordion";
-import { OpenInNewWindowIcon } from "@radix-ui/react-icons";
+import { OpenInNewWindowIcon, TrashIcon } from "@radix-ui/react-icons";
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 /**
  * React component representing a project item in the project directory.
@@ -35,6 +44,7 @@ import { OpenInNewWindowIcon } from "@radix-ui/react-icons";
  * @param setProjectDirectory - The projectDirectory setter function.
  * @param setFilterByTags - The filterByTags setter function.
  * @param collapseAll - The collapseAll state.
+ * @param onDelete - The onDelete callback.
  */
 
 export default function ProjectItem({
@@ -44,6 +54,7 @@ export default function ProjectItem({
   setConfig,
   setFilterByTags,
   collapseAll,
+  onDelete,
 }) {
   const [openDetails, setOpenDetails] = useState(false);
   const { t } = useTranslation();
@@ -137,6 +148,36 @@ export default function ProjectItem({
               className="w-20 justify-center"
               onClick={handleAccordion}
             ></AccordionTrigger>
+            <Dialog>
+              <DialogTrigger>
+                <Button variant="outline" className="ml-2">
+                  <TrashIcon className={"w-4 h-4"} />
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  {t("You are about to delete the project:")}
+                </DialogHeader>
+                <DialogDescription>
+                  <p className="m-4 ml-0 font-bold text-xl text-foreground">
+                    {project.name}
+                  </p>
+                  <Alert className="m-4  ml-0">
+                    <AlertDescription>
+                      {t(
+                        "This will only delete the project within Ableton Live Manager, you're original project remains in its original place.",
+                      )}
+                    </AlertDescription>
+                  </Alert>
+                  <Button
+                    variant="destructive"
+                    onClick={() => onDelete(project)}
+                  >
+                    {t("Delete")}
+                  </Button>
+                </DialogDescription>
+              </DialogContent>
+            </Dialog>
           </section>
         </section>
 

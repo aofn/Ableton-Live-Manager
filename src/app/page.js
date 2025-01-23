@@ -3,7 +3,12 @@
 import ProjectItem from "@/components/ProjectItem";
 import { useEffect, useState } from "react";
 import Settings from "@/components/Settings";
-import { BaseDirectory, readDir, readTextFile } from "@tauri-apps/api/fs";
+import {
+  BaseDirectory,
+  readDir,
+  readTextFile,
+  writeTextFile,
+} from "@tauri-apps/api/fs";
 import { Input } from "@/components/ui/input";
 import { NavigationMenu } from "@/components/ui/navigation-menu";
 import { Separator } from "@radix-ui/react-menubar";
@@ -104,66 +109,78 @@ export default function Home() {
 
   useEffect(() => {
     setProjectDirectory(config?.directoryPath);
-    setFolders(config?.folders);
+    setFolders(config?.directories);
   }, [config]);
 
   useEffect(() => {
     let isMounted = true;
-    if (!projectDirectory.folders) return;
 
-    const processEntries = async (path) => {
-      for (let i = 0; i < folders.length; i++) {
-        const entries = await readDir(path, {
+    if (!folders || folders.length < 0) return;
+
+    const processEntries = async () => {
+      // const projectFolder = await readDir(
+      //   "/Users/marcel/Music/Ableton/Projects/",
+      //   {
+      //     directory: true,
+      //     recursive: true,
+      //   },
+      // );
+      // console.log(projectFolder);
+      setDisplayProgress(true);
+      setTotalScan(folders.length);
+      // create copy of folders array
+      const copyOfFolders = [...folders];
+      //filter strings from folders array
+      copyOfFolders.filter((entry) => typeof entry === "object");
+      for (let [i, entry] of copyOfFolders.entries()) {
+        if (!entry.path) continue;
+        const entries = await readDir(entry.path, {
           directory: true,
           recursive: true,
         });
-        setDisplayProgress(true);
-        setTotalScan(entries.length);
-        for (let [i, entry] of entries.entries()) {
-          setCurrentScan(i);
-          const percentage = (i / entries.length) * 100;
-          setProgressTotal(parseInt(percentage));
-          // console.log(entry.path)
-          try {
-            await invoke("is_file", { path: entry.path });
-          } catch {
-            entries.splice(i, 1);
-            continue;
-          }
-          if (entry.children) {
-            for (let [i, child] of entry.children.entries()) {
-              const isFile = await invoke("is_file", {
-                path: child.path,
-              }).catch(() => {
-                entry.children.splice(i, 1);
-              });
-              // look for existing alm.json file
-              if (child.path.endsWith("alm.json")) {
-                // add apm object to entry
-                const almFile = await readTextFile(child.path);
-                const almJson = JSON.parse(almFile);
-                entry.alm = almJson;
-              }
+        setCurrentScan(i);
+        const percentage = (i / folders.length) * 100;
+        setProgressTotal(parseInt(percentage));
+        // console.log(entry.path)
+        try {
+          await invoke("is_file", { path: entry.path });
+        } catch {
+          folders.splice(i, 1);
+          continue;
+        }
+        if (entry.children) {
+          for (let [i, child] of entry.children.entries()) {
+            const isFile = await invoke("is_file", {
+              path: child.path,
+            }).catch(() => {
+              entry.children.splice(i, 1);
+            });
+            // look for existing alm.json file
+            if (child.path.endsWith("alm.json")) {
+              // add apm object to entry
+              const almFile = await readTextFile(child.path);
+              const almJson = JSON.parse(almFile);
+              entry.alm = almJson;
+            }
 
-              if (child.path.endsWith(".als")) {
-                setCurrentScanPath(child.name);
-              }
+            if (child.path.endsWith(".als")) {
+              setCurrentScanPath(child.name);
             }
           }
         }
-        setDirectoryEntries(entries);
-        setDisplayProgress(false);
       }
+      setDirectoryEntries(copyOfFolders);
+      setDisplayProgress(false);
     };
 
-    if (projectDirectory && isMounted) {
-      processEntries(projectDirectory);
+    if (folders && isMounted) {
+      processEntries(folders);
     }
 
     return () => {
       isMounted = false;
     };
-  }, [projectDirectory]);
+  }, [folders, config]);
 
   useEffect(() => {
     const getConfig = async () => {
@@ -199,6 +216,24 @@ export default function Home() {
     return aTagsString.localeCompare(bTagsString) * -1;
   };
 
+  const handleDeleteProject = async (projectPath) => {
+    setDirectoryEntries((prevEntries) =>
+      prevEntries.filter((entry) => entry.path !== projectPath),
+    );
+    // Update the config state
+    const updatedConfig = {
+      ...config,
+      directories: config.directories.filter((dir) => dir.path !== projectPath),
+    };
+    await writeTextFile("config.json", JSON.stringify(updatedConfig), {
+      dir: BaseDirectory.Data,
+    });
+
+    setConfig(updatedConfig);
+
+    // Save the updated config to the file
+  };
+
   // sort projects by name
   const sortByName = (a, b) => {
     return _.sortBy([a, b], ["name"]);
@@ -213,7 +248,6 @@ export default function Home() {
         totalScan={totalScan}
       />
     );
-
   return (
     <>
       <header
@@ -295,15 +329,11 @@ export default function Home() {
                   filterByTags={filterByTags}
                   setFilterByTags={setFilterByTags}
                   collapseAll={collapseAll}
+                  onDelete={handleDeleteProject}
                 />
               );
             })}
         <DropZone onFolderDrop={handleFolderDrop} />
-        <ul>
-          {folders.map((folder, index) => (
-            <li key={index}>{folder}</li>
-          ))}
-        </ul>
       </main>
     </>
   );
