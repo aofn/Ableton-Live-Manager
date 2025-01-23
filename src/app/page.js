@@ -3,7 +3,12 @@
 import ProjectItem from "@/components/ProjectItem";
 import { useEffect, useState } from "react";
 import Settings from "@/components/Settings";
-import { BaseDirectory, readDir, readTextFile } from "@tauri-apps/api/fs";
+import {
+  BaseDirectory,
+  readDir,
+  readTextFile,
+  writeTextFile,
+} from "@tauri-apps/api/fs";
 import { Input } from "@/components/ui/input";
 import { NavigationMenu } from "@/components/ui/navigation-menu";
 import { Separator } from "@radix-ui/react-menubar";
@@ -24,6 +29,7 @@ import { cn } from "@/lib/utils";
 import { badgeVariants } from "@/components/ui/badge";
 import "remixicon/fonts/remixicon.css";
 import _ from "lodash";
+import DropZone from "@/components/DropZone";
 
 /**
  * Displays a progress bar while scanning the project directory.
@@ -65,6 +71,7 @@ export default function Home() {
   const [filterByTags, setFilterByTags] = useState([]);
   const [collapseAll, setCollapseAll] = useState(true);
   const [sortMethod, setSortMethod] = useState([]);
+  const [folders, setFolders] = useState([]);
   const { t } = useTranslation();
   const colourStyles = {
     option: (styles, { data, isDisabled, isFocused, isSelected }) => ({
@@ -101,36 +108,51 @@ export default function Home() {
   };
 
   useEffect(() => {
-    setProjectDirectory(config?.directoryPath);
+    // setProjectDirectory(config?.directoryPath);
+    setFolders(config?.directories);
   }, [config]);
 
   useEffect(() => {
     let isMounted = true;
-    const processEntries = async (path) => {
-      const entries = await readDir(path, { directory: true, recursive: true });
+
+    if (!folders || folders.length === 0) return;
+
+    const processEntries = async () => {
       setDisplayProgress(true);
-      setTotalScan(entries.length);
-      for (let [i, entry] of entries.entries()) {
+      setTotalScan(folders.length);
+
+      const copyOfFolders = [...folders].filter(
+        (entry) => typeof entry === "object",
+      );
+
+      for (let [i, entry] of copyOfFolders.entries()) {
+        if (!entry.path) continue;
+
+        const entries = await readDir(entry.path, {
+          directory: true,
+          recursive: true,
+        });
+
         setCurrentScan(i);
-        const percentage = (i / entries.length) * 100;
+        const percentage = (i / folders.length) * 100;
         setProgressTotal(parseInt(percentage));
-        // console.log(entry.path)
+
         try {
           await invoke("is_file", { path: entry.path });
         } catch {
-          entries.splice(i, 1);
+          copyOfFolders.splice(i, 1);
           continue;
         }
+
         if (entry.children) {
-          for (let [i, child] of entry.children.entries()) {
-            const isFile = await invoke("is_file", { path: child.path }).catch(
-              () => {
-                entry.children.splice(i, 1);
-              },
-            );
-            // look for existing alm.json file
+          for (let [j, child] of entry.children.entries()) {
+            try {
+              const isFile = await invoke("is_file", { path: child.path });
+            } catch {
+              entry.children.splice(j, 1);
+            }
+
             if (child.path.endsWith("alm.json")) {
-              // add apm object to entry
               const almFile = await readTextFile(child.path);
               const almJson = JSON.parse(almFile);
               entry.alm = almJson;
@@ -142,18 +164,19 @@ export default function Home() {
           }
         }
       }
-      setDirectoryEntries(entries);
-      setDisplayProgress(false);
+
+      if (isMounted) {
+        setDirectoryEntries(copyOfFolders);
+        setDisplayProgress(false);
+      }
     };
 
-    if (projectDirectory && isMounted) {
-      processEntries(projectDirectory);
-    }
+    processEntries();
 
     return () => {
       isMounted = false;
     };
-  }, [projectDirectory]);
+  }, [folders, config]);
 
   useEffect(() => {
     const getConfig = async () => {
@@ -170,6 +193,32 @@ export default function Home() {
     getConfig();
   }, []);
 
+  const handleAddingFolder = async (folderPath) => {
+    const folder = await readDir(folderPath, {
+      recursive: true,
+    });
+
+    const folderObject = {
+      name: folderPath.split("/").pop(),
+      path: folderPath,
+      children: folder.map((entry) => ({
+        name: entry.name,
+        path: entry.path,
+      })),
+    };
+
+    const copyConfig = { ...config };
+    if (!copyConfig.directories) {
+      copyConfig.directories = [];
+    }
+    copyConfig.directories.push(folderObject);
+    setConfig(copyConfig);
+
+    await writeTextFile(`config.json`, JSON.stringify(copyConfig, null, 2), {
+      dir: BaseDirectory.Data,
+    });
+  };
+
   // sort function to sort directoryEntries by tags within alm.tags key if alm key exists
   const sortByTags = (a, b) => {
     const aTags = a.alm?.tags ? Object.values(a.alm.tags) : [];
@@ -183,6 +232,29 @@ export default function Home() {
 
     // * -1 reverses order so tags are on top of list
     return aTagsString.localeCompare(bTagsString) * -1;
+  };
+
+  const handleDeleteProject = async (projectPath) => {
+    // Update the directoryEntries state
+    console.log(folders);
+    console.log(projectPath);
+    setFolders((prevEntries) =>
+      prevEntries.filter((entry) => entry.path !== projectPath.path),
+    );
+
+    // Update the config state
+    const updatedConfig = {
+      ...config,
+      directories: config.directories.filter(
+        (dir) => dir.path !== projectPath.path,
+      ),
+    };
+
+    await writeTextFile("config.json", JSON.stringify(updatedConfig), {
+      dir: BaseDirectory.Data,
+    });
+
+    setConfig(updatedConfig);
   };
 
   // sort projects by name
@@ -199,7 +271,6 @@ export default function Home() {
         totalScan={totalScan}
       />
     );
-
   return (
     <>
       <header
@@ -212,9 +283,10 @@ export default function Home() {
             setProjectDirectory={setProjectDirectory}
             setConfig={setConfig}
             config={config}
+            handleAddingFolder={handleAddingFolder}
           />
         </NavigationMenu>
-        <div className="items-end flex justify-items-center items-center py-2 z-50">
+        <div className="flex justify-items-center items-center py-2 z-50">
           <Input
             onChange={(e) => setFilterInput(e.target.value)}
             value={filterInput}
@@ -281,9 +353,11 @@ export default function Home() {
                   filterByTags={filterByTags}
                   setFilterByTags={setFilterByTags}
                   collapseAll={collapseAll}
+                  onDelete={handleDeleteProject}
                 />
               );
             })}
+        <DropZone onFolderDrop={handleAddingFolder} />
       </main>
     </>
   );
