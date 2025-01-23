@@ -156,7 +156,9 @@ export default function ProjectItem({
               </DialogTrigger>
               <DialogContent>
                 <DialogHeader>
-                  {t("You are about to delete the project:")}
+                  {t(
+                    "You are about to delete the following project from Ableton Live Manager",
+                  )}
                 </DialogHeader>
                 <DialogDescription>
                   <p className="m-4 ml-0 font-bold text-xl text-foreground">
