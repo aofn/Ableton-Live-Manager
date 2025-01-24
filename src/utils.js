@@ -1,5 +1,3 @@
-import _ from "lodash";
-
 export function findDeep(obj, key, callback) {
   for (var k in obj) {
     //BaseCase

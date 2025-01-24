@@ -64,7 +64,7 @@ const DisplayProjectContents = ({ name, path, handleOpenProject, almFile }) => {
     const { shell } = await import("@tauri-apps/api");
 
     await shell.open(path);
-  }, []);
+  }, [path]);
 
   return (
     <TableRow className="w-full flex flex-row px-3">

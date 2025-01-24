@@ -39,10 +39,10 @@ export const Tags = ({
 
   const writeTagToAlmFile = async (tag) => {
     function addOrUpdateObjectWithTag(mainObject, addObject, key) {
-      if (!mainObject.hasOwnProperty(key)) {
+      if (!Object.prototype.hasOwnProperty.call(mainObject, key)) {
         mainObject[key] = {};
       }
-      if (!mainObject.hasOwnProperty(key)) {
+      if (!Object.prototype.hasOwnProperty.call(mainObject, key)) {
         mainObject[key] = addObject;
       } else {
         mainObject[key] = { ...mainObject[key], ...addObject };
