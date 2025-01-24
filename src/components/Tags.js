@@ -12,6 +12,7 @@ import {
 import AddTagDialogue from "@/components/AddTagDialogue";
 import { Cross2Icon, PlusIcon } from "@radix-ui/react-icons";
 import { cn } from "@/lib/utils";
+import _ from "lodash";
 
 export const Tags = ({
   setAlmFile,
@@ -28,10 +29,10 @@ export const Tags = ({
   const writeTagToAlmFile = async (tag) => {
     // grab string from last slash (project file name)
     function addOrUpdateObjectWithTag(mainObject, addObject, key) {
-      if (!mainObject.hasOwnProperty(key)) {
+      if (!Object.prototype.hasOwnProperty.call(mainObject, key)) {
         mainObject[key] = {};
       }
-      if (!mainObject.hasOwnProperty(key)) {
+      if (!Object.prototype.hasOwnProperty.call(mainObject, key)) {
         mainObject[key] = addObject;
       } else {
         mainObject[key] = { ...mainObject[key], ...addObject };
@@ -71,7 +72,7 @@ export const Tags = ({
                 key={tag.value}
                 variant={tag.variant}
                 className="px-1 focus-visible:outline-none"
-                onClick={(e) => {
+                onClick={() => {
                   setFilterByTags((prevState) => [...prevState, tag]);
                 }}
               >
@@ -92,18 +93,15 @@ export const Tags = ({
         })}
       <DropdownMenu>
         <DropdownMenuTrigger className="h-fit">
-           <div
-              className="flex flex-row box-border m-0.5 h-6 "
+          <div className="flex flex-row box-border m-0.5 h-6 ">
+            <Badge
+              title={t("add tag")}
+              variant="outline"
+              className="py-0.5 focus-visible:outline-none px-2 h-6"
             >
-          <Badge
-            title={t("add tag")}
-            variant="outline"
-            className="py-0.5 focus-visible:outline-none px-2 h-6"
-            >
-              
-            <PlusIcon />
+              <PlusIcon />
             </Badge>
-            </div>
+          </div>
         </DropdownMenuTrigger>
         <DropdownMenuContent>
           {availableTags &&
