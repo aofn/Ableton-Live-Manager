@@ -96,11 +96,14 @@ export const Tags = ({
             </span>
           </div>
         ))}
-      {xmpKeywords.map((keyword, index) => (
-        <Badge key={index} variant="outline" className="px-1 m-0.5 h-6">
-          {keyword}
-        </Badge>
-      ))}
+      {xmpKeywords.map((keyword, index) => {
+        return (
+          <Badge key={index} variant="outline" className="px-1 m-0.5 h-6">
+            <span className="text-muted-foreground pr-1">{keyword.group}</span>
+            <span>{keyword.tag}</span>
+          </Badge>
+        );
+      })}
       <DropdownMenu>
         <DropdownMenuTrigger className="h-fit">
           <div className="flex flex-row box-border m-0.5 h-6">

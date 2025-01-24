@@ -48,7 +48,10 @@ class Ableton {
           "rdf:Description"
         ][0]["ablFR:items"][0]["rdf:Bag"][0]["rdf:li"][0]["ablFR:keywords"][0][
           "rdf:Bag"
-        ][0]["rdf:li"].map((li) => li);
+        ][0]["rdf:li"].map((li) => {
+          const [group, tag] = li.split("|");
+          return { group, tag };
+        });
         allKeywords.push(...keywords);
       });
     }
