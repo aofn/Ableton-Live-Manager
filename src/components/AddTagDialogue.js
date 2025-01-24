@@ -1,5 +1,7 @@
 "use client";
-
+{
+  /* eslint-disable no-prototype-builtins */
+}
 import { useTranslation } from "react-i18next";
 import { useState } from "react";
 import { BaseDirectory, writeTextFile } from "@tauri-apps/api/fs";
@@ -35,7 +37,7 @@ export default function AddTagDialogue({ config, setConfig }) {
         mainObject.tags = {};
       }
 
-      if (!mainObject.tags.hasOwnProperty(tag)) {
+      if (!Object.prototype.hasOwnProperty.call(mainObject.tags, tag)) {
         mainObject.tags[tag] = { label: tag, variant: style, value: tag };
       }
     }

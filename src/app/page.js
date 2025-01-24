@@ -74,7 +74,7 @@ export default function Home() {
   const [folders, setFolders] = useState([]);
   const { t } = useTranslation();
   const colourStyles = {
-    option: (styles, { data, isDisabled, isFocused, isSelected }) => ({
+    option: (styles) => ({
       ...styles,
       backgroundColor: "black",
       color: "blue",
@@ -128,10 +128,10 @@ export default function Home() {
       for (let [i, entry] of copyOfFolders.entries()) {
         if (!entry.path) continue;
 
-        const entries = await readDir(entry.path, {
-          directory: true,
-          recursive: true,
-        });
+        // const entries = await readDir(entry.path, {
+        //   directory: true,
+        //   recursive: true,
+        // });
 
         setCurrentScan(i);
         const percentage = (i / folders.length) * 100;
@@ -147,15 +147,14 @@ export default function Home() {
         if (entry.children) {
           for (let [j, child] of entry.children.entries()) {
             try {
-              const isFile = await invoke("is_file", { path: child.path });
+              // const isFile = await invoke("is_file", { path: child.path });
             } catch {
               entry.children.splice(j, 1);
             }
 
             if (child.path.endsWith("alm.json")) {
               const almFile = await readTextFile(child.path);
-              const almJson = JSON.parse(almFile);
-              entry.alm = almJson;
+              entry.alm = JSON.parse(almFile);
             }
 
             if (child.path.endsWith(".als")) {
