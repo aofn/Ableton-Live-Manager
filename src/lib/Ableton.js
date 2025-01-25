@@ -1,6 +1,7 @@
 import xml2js from "xml2js";
 import pako from "pako";
 import * as xmlJs from "xml-js";
+import { readTextFile, readDir, exists } from "@tauri-apps/api/fs";
 
 class Ableton {
   UnpackAndCreatJson(xml, OnLoaded, OnError, Original) {
@@ -21,6 +22,48 @@ class Ableton {
         OnError(err);
       }
     });
+  }
+
+  static async parseXmpFiles(projectDirectory) {
+    const folderPath = `${projectDirectory}/Ableton Folder Info`;
+    const folderExists = await exists(folderPath);
+
+    if (!folderExists) {
+      console.warn(`Directory ${folderPath} does not exist.`);
+      return [];
+    }
+
+    const files = await readDir(folderPath);
+    const xmpFiles = files.filter((file) => file.name.endsWith(".xmp"));
+
+    const allKeywords = [];
+    for (const file of xmpFiles) {
+      const xmpContent = await readTextFile(file.path);
+      xml2js.parseString(xmpContent, (err, result) => {
+        if (err) {
+          console.error("Error parsing XMP file:", err);
+          return;
+        }
+        const keywords = result["x:xmpmeta"]["rdf:RDF"][0][
+          "rdf:Description"
+        ][0]["ablFR:items"][0]["rdf:Bag"][0]["rdf:li"][0]["ablFR:keywords"][0][
+          "rdf:Bag"
+        ][0]["rdf:li"].map((li) => {
+          const [group, tag] = li.split("|");
+          return {
+            [li]: {
+              label: tag,
+              variant: "outline",
+              value: li,
+              group: group,
+            },
+          };
+        });
+        console.log(keywords);
+        allKeywords.push(...keywords);
+      });
+    }
+    return allKeywords;
   }
 
   static RemoveDevices(obj, pluginsToRemove) {

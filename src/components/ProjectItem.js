@@ -60,6 +60,7 @@ export default function ProjectItem({
   const { t } = useTranslation();
   const [almFile, setAlmFile] = useState({});
   const [isAccordionOpen, setIsAccordionOpen] = useState("open");
+  const [xmpKeywords, setXmpKeywords] = useState([]);
 
   useEffect(() => {
     setIsAccordionOpen("close");
@@ -84,8 +85,18 @@ export default function ProjectItem({
 
   //@TODO use allPlugins
 
-  // if filteredByTags is active and a project doesn't have any tags return early
-  if (filterByTags.length > 0 && !almFile?.tags) return;
+  // if filteredByTags is active and a project doesn't have any tags or keywords, return early
+  if (
+    filterByTags.length > 0 &&
+    !almFile?.tags &&
+    !xmpKeywords.some((tagObj) =>
+      filterByTags.some(
+        (obj) =>
+          JSON.stringify(obj) === JSON.stringify(Object.values(tagObj)[0]),
+      ),
+    )
+  )
+    return;
 
   // if filteredByTags is active and a project doesn't contain the tag to filter by, return early
   if (
@@ -93,6 +104,12 @@ export default function ProjectItem({
     almFile?.tags &&
     !Object.values(almFile.tags).some((tag) =>
       filterByTags.some((obj) => JSON.stringify(obj) === JSON.stringify(tag)),
+    ) &&
+    !xmpKeywords.some((tagObj) =>
+      filterByTags.some(
+        (obj) =>
+          JSON.stringify(obj) === JSON.stringify(Object.values(tagObj)[0]),
+      ),
     )
   )
     return;
@@ -141,6 +158,8 @@ export default function ProjectItem({
             config={config}
             setConfig={setConfig}
             setFilterByTags={setFilterByTags}
+            xmpKeywords={xmpKeywords}
+            setXmpKeywords={setXmpKeywords}
           />
           <section className="flex ml-auto">
             <Separator orientation="vertical" />
