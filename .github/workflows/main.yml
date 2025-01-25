@@ -20,6 +20,8 @@ jobs:
           node-version: 20
       - name: install Rust stable
         uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: x86_64-apple-darwin, aarch64-apple-darwin
       - name: install dependencies (ubuntu only)
         if: matrix.platform == 'ubuntu-20.04'
         run: |
