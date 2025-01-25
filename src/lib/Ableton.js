@@ -50,8 +50,16 @@ class Ableton {
           "rdf:Bag"
         ][0]["rdf:li"].map((li) => {
           const [group, tag] = li.split("|");
-          return { group, tag };
+          return {
+            [li]: {
+              label: tag,
+              variant: "outline",
+              value: li,
+              group: group,
+            },
+          };
         });
+        console.log(keywords);
         allKeywords.push(...keywords);
       });
     }

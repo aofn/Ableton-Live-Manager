@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { writeTextFile } from "@tauri-apps/api/fs";
 import { Badge, badgeVariants } from "@/components/ui/badge";
@@ -22,11 +22,12 @@ export const Tags = ({
   config,
   setConfig,
   setFilterByTags,
+  xmpKeywords,
+  setXmpKeywords,
 }) => {
   const availableTags = config.tags;
   const { t } = useTranslation();
   const copyAlmFile = { ...almFile };
-  const [xmpKeywords, setXmpKeywords] = useState([]);
 
   useEffect(() => {
     const fetchXmpKeywords = async () => {
@@ -35,6 +36,7 @@ export const Tags = ({
     };
 
     fetchXmpKeywords();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [projectDirectory]);
 
   const writeTagToAlmFile = async (tag) => {
@@ -96,11 +98,17 @@ export const Tags = ({
             </span>
           </div>
         ))}
-      {xmpKeywords.map((keyword, index) => {
+      {xmpKeywords.map((tagObj, index) => {
+        const tag = Object.values(tagObj)[0];
         return (
-          <Badge key={index} variant="outline" className="px-1 m-0.5 h-6">
-            <span className="text-muted-foreground pr-1">{keyword.group}</span>
-            <span>{keyword.tag}</span>
+          <Badge
+            key={index}
+            variant="outline"
+            className="px-1 m-0.5 h-6"
+            onClick={() => setFilterByTags((prevState) => [...prevState, tag])}
+          >
+            <span className="text-muted-foreground pr-1">{tag.group}</span>
+            <span>{tag.label}</span>
           </Badge>
         );
       })}
