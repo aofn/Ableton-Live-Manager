@@ -30,7 +30,17 @@ import { badgeVariants } from "@/components/ui/badge";
 import "remixicon/fonts/remixicon.css";
 import _ from "lodash";
 import DropZone from "@/components/DropZone";
-import { SidebarProvider } from "@/components/ui/sidebar";
+import {
+  SidebarContent,
+  SidebarGroup,
+  SidebarGroupContent,
+  SidebarGroupLabel,
+  SidebarHeader,
+  SidebarMenu,
+  SidebarMenuItem,
+  SidebarProvider,
+  SidebarTrigger,
+} from "@/components/ui/sidebar";
 
 /**
  * Displays a progress bar while scanning the project directory.
@@ -273,7 +283,21 @@ export default function Home() {
     );
   return (
     <>
-      <SidebarProvider></SidebarProvider>
+      <SidebarProvider>
+        <SidebarHeader>header</SidebarHeader>
+        <SidebarContent>
+          <SidebarGroup>group</SidebarGroup>
+          <SidebarGroupLabel>Application</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              <SidebarMenuItem>menu item</SidebarMenuItem>
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarContent>
+        <main>
+          <SidebarTrigger />
+        </main>
+      </SidebarProvider>
       {/*<header*/}
       {/*  className={"w-full flex justify-between sticky top-0 bg-background"}*/}
       {/*>*/}
