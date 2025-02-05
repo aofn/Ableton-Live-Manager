@@ -31,6 +31,7 @@ import "remixicon/fonts/remixicon.css";
 import _ from "lodash";
 import DropZone from "@/components/DropZone";
 import {
+  Sidebar,
   SidebarContent,
   SidebarGroup,
   SidebarGroupContent,
@@ -285,15 +286,17 @@ export default function Home() {
     <>
       <SidebarProvider>
         <SidebarHeader>header</SidebarHeader>
-        <SidebarContent>
-          <SidebarGroup>group</SidebarGroup>
-          <SidebarGroupLabel>Application</SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              <SidebarMenuItem>menu item</SidebarMenuItem>
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarContent>
+        <Sidebar>
+          <SidebarContent>
+            <SidebarGroup>group</SidebarGroup>
+            <SidebarGroupLabel>Application</SidebarGroupLabel>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                <SidebarMenuItem>menu item</SidebarMenuItem>
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarContent>
+        </Sidebar>
         <main>
           <SidebarTrigger />
         </main>
