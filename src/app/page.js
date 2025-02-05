@@ -298,95 +298,98 @@ export default function Home() {
           </SidebarContent>
         </Sidebar>
         <main>
-          <SidebarTrigger />
+          <SidebarTrigger>
+            <Button>Toggle Sidebar</Button>
+          </SidebarTrigger>
+        </main>
+
+        {/*<header*/}
+        {/*  className={"w-full flex justify-between sticky top-0 bg-background"}*/}
+        {/*>*/}
+        {/*  <NavigationMenu>*/}
+        {/*    <Separator />*/}
+        {/*    <Settings*/}
+        {/*      projectDirectory={projectDirectory}*/}
+        {/*      setProjectDirectory={setProjectDirectory}*/}
+        {/*      setConfig={setConfig}*/}
+        {/*      config={config}*/}
+        {/*      handleAddingFolder={handleAddingFolder}*/}
+        {/*    />*/}
+        {/*  </NavigationMenu>*/}
+        {/*  <div className="flex justify-items-center items-center py-2 z-50">*/}
+        {/*    <Input*/}
+        {/*      onChange={(e) => setFilterInput(e.target.value)}*/}
+        {/*      value={filterInput}*/}
+        {/*      className="w-50 m-1"*/}
+        {/*      type="search"*/}
+        {/*      placeholder="Filter"*/}
+        {/*    />*/}
+        {/*    <Select*/}
+        {/*      onChange={setFilterByTags}*/}
+        {/*      value={filterByTags}*/}
+        {/*      className="my-react-select-container rounded-none border-0 basic-multi-select m-1 min-w-[180px] w-200"*/}
+        {/*      classNames={reactSelectClassNames}*/}
+        {/*      classNamePrefix="my-react-select"*/}
+        {/*      styles={colourStyles}*/}
+        {/*      isMulti*/}
+        {/*      placeholder={t("Filter by tag")}*/}
+        {/*      options={config.tags ? Object.values(config.tags) : []}*/}
+        {/*    />*/}
+        {/*    <Select*/}
+        {/*      onChange={setSortMethod}*/}
+        {/*      value={sortMethod}*/}
+        {/*      className="my-react-select-container rounded-none border-0 basic-multi-select m-1 min-w-[180px] w-200"*/}
+        {/*      classNames={reactSelectClassNames}*/}
+        {/*      classNamePrefix="my-react-select"*/}
+        {/*      styles={colourStyles}*/}
+        {/*      placeholder={t("Sort by")}*/}
+        {/*      options={[*/}
+        {/*        { value: "name", label: "Name" },*/}
+        {/*        { value: "tags", label: "Tags" },*/}
+        {/*      ]}*/}
+        {/*    />*/}
+        {/*    <TooltipProvider>*/}
+        {/*      <Tooltip>*/}
+        {/*        <TooltipTrigger>*/}
+        {/*          <Button*/}
+        {/*            variant="outline"*/}
+        {/*            onClick={() => setCollapseAll((prevState) => !prevState)}*/}
+        {/*          >*/}
+        {/*            <EyeClosedIcon />*/}
+        {/*          </Button>*/}
+        {/*        </TooltipTrigger>*/}
+        {/*        <TooltipContent>{t("Collapse all")}</TooltipContent>*/}
+        {/*      </Tooltip>*/}
+        {/*    </TooltipProvider>*/}
+        {/*    <ThemeToggle />*/}
+        {/*  </div>*/}
+        {/*</header>*/}
+        <main>
+          {directoryEntries.length > 0 &&
+            directoryEntries
+              .filter((entry) =>
+                entry.name.toLowerCase().includes(filterInput.toLowerCase()),
+              )
+              .sort(sortMethod.value === "name" ? sortByName : sortByTags)
+              .map((entry) => {
+                return (
+                  <ProjectItem
+                    key={entry.path}
+                    projectDirectory={projectDirectory}
+                    project={entry}
+                    config={config}
+                    setConfig={setConfig}
+                    setProjectDirectory={setProjectDirectory}
+                    filterByTags={filterByTags}
+                    setFilterByTags={setFilterByTags}
+                    collapseAll={collapseAll}
+                    onDelete={handleDeleteProject}
+                  />
+                );
+              })}
+          <DropZone onFolderDrop={handleAddingFolder} />
         </main>
       </SidebarProvider>
-      {/*<header*/}
-      {/*  className={"w-full flex justify-between sticky top-0 bg-background"}*/}
-      {/*>*/}
-      {/*  <NavigationMenu>*/}
-      {/*    <Separator />*/}
-      {/*    <Settings*/}
-      {/*      projectDirectory={projectDirectory}*/}
-      {/*      setProjectDirectory={setProjectDirectory}*/}
-      {/*      setConfig={setConfig}*/}
-      {/*      config={config}*/}
-      {/*      handleAddingFolder={handleAddingFolder}*/}
-      {/*    />*/}
-      {/*  </NavigationMenu>*/}
-      {/*  <div className="flex justify-items-center items-center py-2 z-50">*/}
-      {/*    <Input*/}
-      {/*      onChange={(e) => setFilterInput(e.target.value)}*/}
-      {/*      value={filterInput}*/}
-      {/*      className="w-50 m-1"*/}
-      {/*      type="search"*/}
-      {/*      placeholder="Filter"*/}
-      {/*    />*/}
-      {/*    <Select*/}
-      {/*      onChange={setFilterByTags}*/}
-      {/*      value={filterByTags}*/}
-      {/*      className="my-react-select-container rounded-none border-0 basic-multi-select m-1 min-w-[180px] w-200"*/}
-      {/*      classNames={reactSelectClassNames}*/}
-      {/*      classNamePrefix="my-react-select"*/}
-      {/*      styles={colourStyles}*/}
-      {/*      isMulti*/}
-      {/*      placeholder={t("Filter by tag")}*/}
-      {/*      options={config.tags ? Object.values(config.tags) : []}*/}
-      {/*    />*/}
-      {/*    <Select*/}
-      {/*      onChange={setSortMethod}*/}
-      {/*      value={sortMethod}*/}
-      {/*      className="my-react-select-container rounded-none border-0 basic-multi-select m-1 min-w-[180px] w-200"*/}
-      {/*      classNames={reactSelectClassNames}*/}
-      {/*      classNamePrefix="my-react-select"*/}
-      {/*      styles={colourStyles}*/}
-      {/*      placeholder={t("Sort by")}*/}
-      {/*      options={[*/}
-      {/*        { value: "name", label: "Name" },*/}
-      {/*        { value: "tags", label: "Tags" },*/}
-      {/*      ]}*/}
-      {/*    />*/}
-      {/*    <TooltipProvider>*/}
-      {/*      <Tooltip>*/}
-      {/*        <TooltipTrigger>*/}
-      {/*          <Button*/}
-      {/*            variant="outline"*/}
-      {/*            onClick={() => setCollapseAll((prevState) => !prevState)}*/}
-      {/*          >*/}
-      {/*            <EyeClosedIcon />*/}
-      {/*          </Button>*/}
-      {/*        </TooltipTrigger>*/}
-      {/*        <TooltipContent>{t("Collapse all")}</TooltipContent>*/}
-      {/*      </Tooltip>*/}
-      {/*    </TooltipProvider>*/}
-      {/*    <ThemeToggle />*/}
-      {/*  </div>*/}
-      {/*</header>*/}
-      <main>
-        {directoryEntries.length > 0 &&
-          directoryEntries
-            .filter((entry) =>
-              entry.name.toLowerCase().includes(filterInput.toLowerCase()),
-            )
-            .sort(sortMethod.value === "name" ? sortByName : sortByTags)
-            .map((entry) => {
-              return (
-                <ProjectItem
-                  key={entry.path}
-                  projectDirectory={projectDirectory}
-                  project={entry}
-                  config={config}
-                  setConfig={setConfig}
-                  setProjectDirectory={setProjectDirectory}
-                  filterByTags={filterByTags}
-                  setFilterByTags={setFilterByTags}
-                  collapseAll={collapseAll}
-                  onDelete={handleDeleteProject}
-                />
-              );
-            })}
-        <DropZone onFolderDrop={handleAddingFolder} />
-      </main>
     </>
   );
 }
