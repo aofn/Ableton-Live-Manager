@@ -43,6 +43,7 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
+import AppSidebar from "@/components/AppSidebar";
 
 /**
  * Displays a progress bar while scanning the project directory.
@@ -286,29 +287,7 @@ export default function Home() {
   return (
     <>
       <SidebarProvider>
-        <SidebarHeader>header</SidebarHeader>
-        <Sidebar>
-          <SidebarContent>
-            <SidebarGroup>group</SidebarGroup>
-            <SidebarGroupLabel>Application</SidebarGroupLabel>
-            <SidebarGroupContent>
-              <SidebarMenu>
-                {directoryEntries.map((item) => {
-                  console.log(item);
-                  return (
-                    <SidebarMenuItem key={item.path}>
-                      <SidebarMenuButton asChild>
-                        <a href={item.path}>
-                          <span>{item.name}</span>
-                        </a>
-                      </SidebarMenuButton>
-                    </SidebarMenuItem>
-                  );
-                })}
-              </SidebarMenu>
-            </SidebarGroupContent>
-          </SidebarContent>
-        </Sidebar>
+        <AppSidebar projects={directoryEntries} />
         <main>
           <SidebarTrigger>
             <Button>Toggle Sidebar</Button>
