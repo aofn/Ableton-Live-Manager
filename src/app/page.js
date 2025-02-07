@@ -90,7 +90,6 @@ export default function Home() {
   const [config, setConfig] = useState({});
   const [filterByTags, setFilterByTags] = useState([]);
   const [collapseAll, setCollapseAll] = useState(true);
-  const [sortMethod, setSortMethod] = useState([]);
   const [folders, setFolders] = useState([]);
   const [selectedProject, setSelectedProject] = useState("");
   const [xmpKeywords, setXmpKeywords] = useState([]);
@@ -242,21 +241,6 @@ export default function Home() {
     });
   };
 
-  // sort function to sort directoryEntries by tags within alm.tags key if alm key exists
-  const sortByTags = (a, b) => {
-    const aTags = a.alm?.tags ? Object.values(a.alm.tags) : [];
-    const bTags = b.alm?.tags ? Object.values(b.alm.tags) : [];
-
-    const sortedATags = _.sortBy(aTags, ["value", "label"]);
-    const sortedBTags = _.sortBy(bTags, ["value", "label"]);
-
-    const aTagsString = sortedATags.map((tag) => tag.value).join("");
-    const bTagsString = sortedBTags.map((tag) => tag.value).join("");
-
-    // * -1 reverses order so tags are on top of list
-    return aTagsString.localeCompare(bTagsString) * -1;
-  };
-
   const handleDeleteProject = async (projectPath) => {
     // Update the directoryEntries state
     console.log(folders);
@@ -280,11 +264,6 @@ export default function Home() {
     setConfig(updatedConfig);
   };
 
-  // sort projects by name
-  const sortByName = (a, b) => {
-    return _.sortBy([a, b], ["name"]);
-  };
-
   if (displayProgress)
     return (
       <ProgressBar
@@ -302,12 +281,8 @@ export default function Home() {
           onClick={setSelectedProject}
           selectedProjectPath={selectedProject.path}
           handleDelete={handleDeleteProject}
+          filterInput={filterInput}
         />
-        <main>
-          <SidebarTrigger>
-            <Button>Toggle Sidebar</Button>
-          </SidebarTrigger>
-        </main>
         <main>
           {selectedProject && (
             <ProjectDetails
