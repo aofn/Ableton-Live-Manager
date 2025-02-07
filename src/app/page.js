@@ -282,6 +282,9 @@ export default function Home() {
           selectedProjectPath={selectedProject.path}
           handleDelete={handleDeleteProject}
           filterInput={filterInput}
+          config={config}
+          setConfig={setConfig}
+          handleAddingFolder={handleAddingFolder}
         />
         <main>
           {selectedProject && (

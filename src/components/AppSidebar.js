@@ -24,6 +24,8 @@ import {
 import { MoreHorizontal } from "lucide-react";
 import _ from "lodash";
 import { useTranslation } from "react-i18next";
+import ReadDirectory from "@/components/ReadDirectory";
+import Settings from "@/components/Settings";
 
 // sort projects by name
 const sortByName = (a, b) => {
@@ -51,6 +53,9 @@ const AppSidebar = ({
   selectedProjectPath,
   handleDelete,
   filterInput,
+  config,
+  setConfig,
+  handleAddingFolder,
 }) => {
   const [sortMethod, setSortMethod] = useState("");
   const { t } = useTranslation();
@@ -58,13 +63,18 @@ const AppSidebar = ({
   return (
     <Sidebar>
       <SidebarContent>
+        <SidebarHeader className="px-0">
+          <Settings
+            config={config}
+            setConfig={setConfig}
+            handleAddingFolder={handleAddingFolder}
+          />
+        </SidebarHeader>
+
         <SidebarGroup>
-          <SidebarHeader>{t("Ableton Live Manager")}</SidebarHeader>
-        </SidebarGroup>
-        <SidebarGroup>
-          <SidebarGroupLabel>Projects</SidebarGroupLabel>
+          <SidebarGroupLabel>{t("Projects")}</SidebarGroupLabel>
           <SidebarGroupAction title="Add Project">
-            <PlusIcon /> <span className="sr-only">Add Project</span>
+            <PlusIcon /> <span className="sr-only">{t("Add Project")}</span>
           </SidebarGroupAction>
           <SidebarGroupContent>
             <SidebarMenu className="list-none">
@@ -94,7 +104,7 @@ const AppSidebar = ({
                             handleDelete(item.path);
                           }}
                         >
-                          <span>Delete Project</span>
+                          <span>{t("Delete Project")}</span>
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>

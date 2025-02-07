@@ -112,30 +112,23 @@ const TagRow = ({ label, callback }) => {
   );
 };
 
-const Settings = ({
-  projectDirectory,
-  setProjectDirectory,
-  config,
-  setConfig,
-  handleAddingFolder,
-}) => {
+const Settings = ({ config, setConfig, handleAddingFolder }) => {
   const { t } = useTranslation("settings");
 
   return (
-    <Menubar className="border-none ">
+    <Menubar className="border-none bg-sidebar">
       <MenubarMenu>
-        <MenubarTrigger className="flex flex-row">
-          {t("Ableton Live Manager")} <ChevronDownIcon />
+        <MenubarTrigger className="flex flex-row justify-between w-full">
+          <span>{t("Ableton Live Manager")}</span>
+          <ChevronDownIcon />
         </MenubarTrigger>
         <MenubarContent>
           <ReadDirectory
-            projectDirectory={projectDirectory}
             config={config}
             setConfig={setConfig}
-            setProjectDirectory={setProjectDirectory}
             handleAddingFolder={handleAddingFolder}
           />
-          <RemoveTags config={config} projectDirectory={projectDirectory} />
+          <RemoveTags config={config} />
         </MenubarContent>
       </MenubarMenu>
     </Menubar>
