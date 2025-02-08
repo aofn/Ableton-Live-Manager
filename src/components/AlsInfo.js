@@ -153,7 +153,7 @@ const AlsInfo = ({
   if (!projectObject && errorMessage) return errorMessage;
 
   return (
-    <Tabs defaultValue="project" className="h-full space-y-6">
+    <Tabs defaultValue="project" className="h-full w-full flex flex-col">
       <div className="sticky top-0 z-10 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <TabsList className="w-full justify-start h-12 px-4 border-b rounded-none">
           <TabsTrigger
@@ -178,66 +178,70 @@ const AlsInfo = ({
           </button>
         </TabsList>
       </div>
+      <div className="flex-1 overflow-auto">
+        {" "}
+        {/* Added wrapper div with flex-1 and overflow-auto */}
+        <TabsContent value="project" className="px-4 pb-4 h-full">
+          {projectObject ? (
+            <div className="space-y-6">
+              <div className="space-y-1">
+                <div className="flex items-center gap-2">
+                  <Badge variant="secondary" className="rounded-md">
+                    {projectObject.Ableton.LiveSet?.MasterTrack
+                      ? projectObject.Ableton.LiveSet.MasterTrack.DeviceChain
+                          .Mixer.Tempo.Manual.Value
+                      : projectObject.Ableton.LiveSet.MainTrack.DeviceChain
+                          .Mixer.Tempo.Manual.Value}
+                    {" BPM"}
+                  </Badge>
+                  <span className="text-sm text-muted-foreground">
+                    {projectObject?.Ableton.Creator}
+                  </span>
+                </div>
+              </div>
 
-      <TabsContent value="project" className="px-4 pb-4">
-        {projectObject ? (
-          <div className="space-y-6">
-            <div className="space-y-1">
-              <div className="flex items-center gap-2">
-                <Badge variant="secondary" className="rounded-md">
-                  {projectObject.Ableton.LiveSet?.MasterTrack
-                    ? projectObject.Ableton.LiveSet.MasterTrack.DeviceChain
-                        .Mixer.Tempo.Manual.Value
-                    : projectObject.Ableton.LiveSet.MainTrack.DeviceChain.Mixer
-                        .Tempo.Manual.Value}
-                  {" BPM"}
-                </Badge>
-                <span className="text-sm text-muted-foreground">
-                  {projectObject?.Ableton.Creator}
-                </span>
+              <Separator />
+
+              <div className="space-y-6">
+                <TrackDetails
+                  label="Audio Tracks"
+                  tracks={projectObject.Ableton.LiveSet.Tracks.AudioTrack}
+                />
+                <TrackDetails
+                  label="Midi Tracks"
+                  tracks={projectObject.Ableton.LiveSet.Tracks.MidiTrack}
+                />
+                <TrackDetails
+                  label="Return Tracks"
+                  tracks={projectObject.Ableton.LiveSet.Tracks.ReturnTrack}
+                />
               </div>
             </div>
-
-            <Separator />
-
-            <div className="space-y-6">
-              <TrackDetails
-                label="Audio Tracks"
-                tracks={projectObject.Ableton.LiveSet.Tracks.AudioTrack}
-              />
-              <TrackDetails
-                label="Midi Tracks"
-                tracks={projectObject.Ableton.LiveSet.Tracks.MidiTrack}
-              />
-              <TrackDetails
-                label="Return Tracks"
-                tracks={projectObject.Ableton.LiveSet.Tracks.ReturnTrack}
-              />
+          ) : (
+            <div className="space-y-4">
+              <Skeleton className="h-4 w-[100px]" />
+              <Skeleton className="h-8 w-[400px]" />
+              <Skeleton className="h-8 w-[400px]" />
+              <Skeleton className="h-8 w-[400px]" />
+              <Skeleton className="h-8 w-[400px]" />
             </div>
-          </div>
-        ) : (
-          <div className="space-y-4">
-            <Skeleton className="h-4 w-[100px]" />
-            <Skeleton className="h-8 w-[400px]" />
-            <Skeleton className="h-8 w-[400px]" />
-            <Skeleton className="h-8 w-[400px]" />
-            <Skeleton className="h-8 w-[400px]" />
-          </div>
-        )}
-      </TabsContent>
-
-      <TabsContent value="thirdPartyPlugins" className="px-4 pb-4">
-        {loading ? (
-          <div className="flex items-center justify-center h-32">
-            <p className="text-sm text-muted-foreground">Loading plugins...</p>
-          </div>
-        ) : (
-          <DisplayThirdPartyPlugins
-            thirdPartyPlugins={auPlugins.concat(vstPlugins, vst3Plugins)}
-            removePlugins={removePlugins}
-          />
-        )}
-      </TabsContent>
+          )}
+        </TabsContent>
+        <TabsContent value="thirdPartyPlugins" className="px-4 pb-4 h-full">
+          {loading ? (
+            <div className="flex items-center justify-center h-32">
+              <p className="text-sm text-muted-foreground">
+                Loading plugins...
+              </p>
+            </div>
+          ) : (
+            <DisplayThirdPartyPlugins
+              thirdPartyPlugins={auPlugins.concat(vstPlugins, vst3Plugins)}
+              removePlugins={removePlugins}
+            />
+          )}
+        </TabsContent>
+      </div>
     </Tabs>
   );
 };

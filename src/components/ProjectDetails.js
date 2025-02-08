@@ -56,7 +56,7 @@ const ProjectDetails = ({
         </div>
       </header>
 
-      <section className="py-6 px-4">
+      <section className="py-4 px-4">
         <Tags
           tags={selectedProject.alm}
           name={selectedProject.name}
@@ -70,17 +70,17 @@ const ProjectDetails = ({
         />
       </section>
 
-      <Separator className="ml-6" />
+      <Separator />
 
       <section className="flex-1 pb-6">
-        <div className="grid grid-cols-2 h-[calc(100vh-16rem)] min-h-[400px]">
+        <div className="grid grid-cols-2 h-full">
           <FolderView
             project={selectedProject}
             almFile={selectedProject.alm}
             handleOpenProject={handleOpenProject}
           />
           <div className="flex">
-            <Separator orientation="vertical" className="mx-6" />
+            <Separator orientation="vertical" className="" />
             <RightColumn
               openDetails={openDetails}
               name={selectedProject.name}

@@ -262,7 +262,7 @@ export default function Home() {
             setConfig={setConfig}
             handleAddingFolder={handleAddingFolder}
           />
-          <main>
+          <main className="w-full">
             {selectedProject && (
               <ProjectDetails
                 selectedProject={selectedProject}
