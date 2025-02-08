@@ -232,6 +232,11 @@ export default function Home() {
     setConfig(updatedConfig);
   };
 
+  const handleSideBarClick = (project) => {
+    setSelectedProject(project);
+    setOpenDetails(false);
+  };
+
   if (displayProgress)
     return (
       <ProgressBar
@@ -254,7 +259,7 @@ export default function Home() {
         <SidebarProvider>
           <AppSidebar
             projects={directoryEntries}
-            onClick={setSelectedProject}
+            onClick={handleSideBarClick}
             selectedProjectPath={selectedProject.path}
             handleDelete={handleDeleteProject}
             filterInput={filterInput}

@@ -20,6 +20,7 @@ const DroppableGroup = ({
       },
       drop: (item, monitor) => {
         if (monitor.didDrop()) {
+          group.isDropping = false;
           return;
         }
 
