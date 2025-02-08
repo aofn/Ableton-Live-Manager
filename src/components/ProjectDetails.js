@@ -31,34 +31,32 @@ const ProjectDetails = ({
   };
 
   return (
-    <>
-      <header
-        className={"w-full flex justify-between sticky top-0 bg-background"}
-      >
-        <div className="flex justify-items-center items-center py-2 z-50">
-          <h1>{selectedProject.name}</h1>
-        </div>
-      </header>
-      <section className="p-3 w-full flex flex-row">
-        <section className="w-1/2">
+    <div className="flex flex-col h-full">
+      <header className="sticky top-0 z-50 w-full bg-background border-b">
+        <div className="container flex flex-col gap-1 max-w-screen-2xl py-4">
+          <h1 className="text-xl font-semibold tracking-tight">
+            {selectedProject.name}
+          </h1>
           <CardDescription
-            className="cursor-pointer text-xs"
+            className="group cursor-pointer text-sm hover:text-foreground/80 transition-colors"
             onClick={() => open(selectedProject.path)}
           >
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger>
-                  <span className="flex justify-center hover:underline">
-                    {selectedProject.path}
-                    <OpenInNewWindowIcon className="self-center ml-1" />
+                  <span className="flex items-center gap-1.5">
+                    <span className="truncate">{selectedProject.path}</span>
+                    <OpenInNewWindowIcon className="h-4 w-4 opacity-0 group-hover:opacity-100 transition-opacity" />
                   </span>
                 </TooltipTrigger>
                 <TooltipContent>{t("open path")}</TooltipContent>
               </Tooltip>
             </TooltipProvider>
           </CardDescription>
-        </section>
-        <Separator orientation="vertical" />
+        </div>
+      </header>
+
+      <section className="container max-w-screen-2xl py-6">
         <Tags
           tags={selectedProject.alm}
           name={selectedProject.name}
@@ -71,23 +69,30 @@ const ProjectDetails = ({
           setXmpKeywords={setXmpKeywords}
         />
       </section>
-      <Separator />
-      <section className="grid grid-cols-2 h-[40vh] min-h-[400px]">
-        <FolderView
-          project={selectedProject}
-          almFile={selectedProject.alm}
-          handleOpenProject={handleOpenProject}
-        />
-        <RightColumn
-          openDetails={openDetails}
-          name={selectedProject.name}
-          almFile={selectedProject.alm}
-          setAlmFile={() => console.log("setAlmFile")}
-          projectDirectory={selectedProject.path}
-          setOpenDetails={setOpenDetails}
-        />
+
+      <Separator className="mb-6" />
+
+      <section className="container flex-1 max-w-screen-2xl pb-6">
+        <div className="grid grid-cols-2 h-[calc(100vh-16rem)] min-h-[400px]">
+          <FolderView
+            project={selectedProject}
+            almFile={selectedProject.alm}
+            handleOpenProject={handleOpenProject}
+          />
+          <div className="flex">
+            <Separator orientation="vertical" className="mx-6" />
+            <RightColumn
+              openDetails={openDetails}
+              name={selectedProject.name}
+              almFile={selectedProject.alm}
+              setAlmFile={() => console.log("setAlmFile")}
+              projectDirectory={selectedProject.path}
+              setOpenDetails={setOpenDetails}
+            />
+          </div>
+        </div>
       </section>
-    </>
+    </div>
   );
 };
 
