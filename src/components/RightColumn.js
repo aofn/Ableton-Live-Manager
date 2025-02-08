@@ -13,7 +13,7 @@ export const RightColumn = ({
   return (
     <div className="flex-1">
       <div
-        className="overflow-y-auto px-4"
+        className="overflow-y-auto"
         style={{ maxHeight: "calc(100vh - 20rem)" }}
       >
         {openDetails ? (

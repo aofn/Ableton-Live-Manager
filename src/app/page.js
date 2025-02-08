@@ -248,9 +248,6 @@ export default function Home() {
         backend={TouchBackend}
         options={{
           enableMouseEvents: true,
-          enableTouchEvents: true,
-          preventDefaultTouchStart: true,
-          delayTouchStart: 100, // Add a small delay to help distinguish between taps and drags
         }}
       >
         <CustomDragLayer />

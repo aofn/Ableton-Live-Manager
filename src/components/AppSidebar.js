@@ -122,23 +122,24 @@ const AppSidebar = ({
           />
         </SidebarHeader>
         <SidebarGroupLabel>{t("Groups")}</SidebarGroupLabel>
-
-        <SidebarGroup>
-          <SidebarMenu className="list-none">
-            {groups.map((group) => (
-              <CollapsibleGroup
-                key={group.name}
-                group={group}
-                handleAddProjectToGroup={handleAddProjectToGroup}
-                onClick={onClick}
-                selectedProjectPath={selectedProjectPath}
-                config={config}
-                setConfig={setConfig}
-                updateConfigFile={updateConfigFile}
-              />
-            ))}
-          </SidebarMenu>
-        </SidebarGroup>
+        {groups.length > 0 && (
+          <SidebarGroup>
+            <SidebarMenu className="list-none">
+              {groups.map((group) => (
+                <CollapsibleGroup
+                  key={group.name}
+                  group={group}
+                  handleAddProjectToGroup={handleAddProjectToGroup}
+                  onClick={onClick}
+                  selectedProjectPath={selectedProjectPath}
+                  config={config}
+                  setConfig={setConfig}
+                  updateConfigFile={updateConfigFile}
+                />
+              ))}
+            </SidebarMenu>
+          </SidebarGroup>
+        )}
         <SidebarGroup className="list-none text-muted-foreground">
           <SidebarMenuItem>
             {toggleCreateGroup ? (

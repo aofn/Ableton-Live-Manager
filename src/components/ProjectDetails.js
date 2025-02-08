@@ -70,7 +70,7 @@ const ProjectDetails = ({
         />
       </section>
 
-      <Separator className="mb-6" />
+      <Separator className="ml-6" />
 
       <section className="flex-1 pb-6">
         <div className="grid grid-cols-2 h-[calc(100vh-16rem)] min-h-[400px]">

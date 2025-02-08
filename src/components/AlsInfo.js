@@ -12,17 +12,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import DisplayThirdPartyPlugins from "@/components/DisplayThirdPartyPlugins";
 import { Cross2Icon } from "@radix-ui/react-icons";
 import { Separator } from "@/components/ui/separator";
-
-/**
- * Displays the details of an Ableton project.
- * @param path - The path to the project file.
- * @param projectDirectory - The path to the project directory.
- * @param onClose - Callback function to close the modal.
- * @param almFile - The APM file associated with the project.
- * @param name - The name of the project.
- * @param setAlmFile - The setAlmFile setter function.
- * @returns {JSX.Element|string} - The JSX element representing the project details.
- */
+import { Badge } from "@/components/ui/badge";
 
 const AlsInfo = ({
   path,
@@ -163,63 +153,84 @@ const AlsInfo = ({
   if (!projectObject && errorMessage) return errorMessage;
 
   return (
-    <Tabs defaultValue="project">
-      <TabsList className="w-full justify-start">
-        <TabsTrigger disabled={!projectObject} value="project">
-          {t("Project Details")}
-        </TabsTrigger>
-        <TabsTrigger disabled={!projectObject} value="thirdPartyPlugins">
-          {t("Third Party Plugins")}
-        </TabsTrigger>
-        <TabsTrigger
-          className="ml-auto"
-          onClick={() => onClose()}
-          value="close"
-        >
-          <Cross2Icon />
-        </TabsTrigger>
-      </TabsList>
-      <TabsContent value="project">
+    <Tabs defaultValue="project" className="h-full space-y-6">
+      <div className="sticky top-0 z-10 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+        <TabsList className="w-full justify-start h-12 px-4 border-b rounded-none">
+          <TabsTrigger
+            disabled={!projectObject}
+            value="project"
+            className="data-[state=active]:bg-background"
+          >
+            {t("Project Details")}
+          </TabsTrigger>
+          <TabsTrigger
+            disabled={!projectObject}
+            value="thirdPartyPlugins"
+            className="data-[state=active]:bg-background"
+          >
+            {t("Third Party Plugins")}
+          </TabsTrigger>
+          <button
+            className="ml-auto flex h-8 w-8 items-center justify-center rounded-md hover:bg-muted"
+            onClick={onClose}
+          >
+            <Cross2Icon className="h-4 w-4" />
+          </button>
+        </TabsList>
+      </div>
+
+      <TabsContent value="project" className="px-4 pb-4">
         {projectObject ? (
-          <>
-            <p className="py-1">
-              {t("BPM:")}
-              <span className="px-1">
-                {projectObject.Ableton.LiveSet?.MasterTrack
-                  ? projectObject.Ableton.LiveSet.MasterTrack.DeviceChain.Mixer
-                      .Tempo.Manual.Value
-                  : projectObject.Ableton.LiveSet.MainTrack.DeviceChain.Mixer
-                      .Tempo.Manual.Value}
-              </span>
-            </p>
-            <p className="py-1">{projectObject?.Ableton.Creator}</p>
+          <div className="space-y-6">
+            <div className="space-y-1">
+              <div className="flex items-center gap-2">
+                <Badge variant="secondary" className="rounded-md">
+                  {projectObject.Ableton.LiveSet?.MasterTrack
+                    ? projectObject.Ableton.LiveSet.MasterTrack.DeviceChain
+                        .Mixer.Tempo.Manual.Value
+                    : projectObject.Ableton.LiveSet.MainTrack.DeviceChain.Mixer
+                        .Tempo.Manual.Value}
+                  {" BPM"}
+                </Badge>
+                <span className="text-sm text-muted-foreground">
+                  {projectObject?.Ableton.Creator}
+                </span>
+              </div>
+            </div>
+
             <Separator />
-            <TrackDetails
-              label={"Audio Tracks"}
-              tracks={projectObject.Ableton.LiveSet.Tracks.AudioTrack}
-            />
-            <TrackDetails
-              label={"Midi Tracks"}
-              tracks={projectObject.Ableton.LiveSet.Tracks.MidiTrack}
-            />
-            <TrackDetails
-              label={"Return Tracks"}
-              tracks={projectObject.Ableton.LiveSet.Tracks.ReturnTrack}
-            />
-          </>
+
+            <div className="space-y-6">
+              <TrackDetails
+                label="Audio Tracks"
+                tracks={projectObject.Ableton.LiveSet.Tracks.AudioTrack}
+              />
+              <TrackDetails
+                label="Midi Tracks"
+                tracks={projectObject.Ableton.LiveSet.Tracks.MidiTrack}
+              />
+              <TrackDetails
+                label="Return Tracks"
+                tracks={projectObject.Ableton.LiveSet.Tracks.ReturnTrack}
+              />
+            </div>
+          </div>
         ) : (
-          <div className="space-y-2">
-            <Skeleton className="h-4 w-[100]" />
-            <Skeleton className="h-8 w-[400]" />
-            <Skeleton className="h-8 w-[400]" />
-            <Skeleton className="h-8 w-[400]" />
-            <Skeleton className="h-8 w-[400]" />
+          <div className="space-y-4">
+            <Skeleton className="h-4 w-[100px]" />
+            <Skeleton className="h-8 w-[400px]" />
+            <Skeleton className="h-8 w-[400px]" />
+            <Skeleton className="h-8 w-[400px]" />
+            <Skeleton className="h-8 w-[400px]" />
           </div>
         )}
       </TabsContent>
-      <TabsContent value="thirdPartyPlugins">
+
+      <TabsContent value="thirdPartyPlugins" className="px-4 pb-4">
         {loading ? (
-          "loading plugins"
+          <div className="flex items-center justify-center h-32">
+            <p className="text-sm text-muted-foreground">Loading plugins...</p>
+          </div>
         ) : (
           <DisplayThirdPartyPlugins
             thirdPartyPlugins={auPlugins.concat(vstPlugins, vst3Plugins)}
@@ -230,4 +241,5 @@ const AlsInfo = ({
     </Tabs>
   );
 };
+
 export default AlsInfo;
