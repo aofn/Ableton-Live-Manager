@@ -14,6 +14,8 @@ const DroppableGroup = ({
         // When item is being dragged over, ensure parent knows we're in a drop operation
         if (monitor.isOver({ shallow: true })) {
           group.isDropping = true;
+        } else {
+          group.isDropping = false;
         }
       },
       drop: (item, monitor) => {
@@ -22,14 +24,13 @@ const DroppableGroup = ({
         }
 
         console.log("Drop event triggered");
-        group.isDropping = true;
 
-        // Use setTimeout to ensure state updates happen after the drop
-        setTimeout(() => {
-          handleAddProjectToGroup(group.name, item.project);
-          onDrop && onDrop();
-          group.isDropping = false;
-        }, 0);
+        // Handle the actual project drop
+        handleAddProjectToGroup(group.name, item.project);
+        onDrop && onDrop();
+
+        // Reset the dropping state after the drop
+        group.isDropping = false;
 
         return { dropped: true };
       },
