@@ -33,7 +33,7 @@ const ProjectDetails = ({
   return (
     <div className="flex flex-col h-full">
       <header className="sticky top-0 z-50 w-full bg-background border-b">
-        <div className="container flex flex-col gap-1 max-w-screen-2xl py-4">
+        <div className="flex flex-col gap-1 py-4 px-4">
           <h1 className="text-xl font-semibold tracking-tight">
             {selectedProject.name}
           </h1>
@@ -56,7 +56,7 @@ const ProjectDetails = ({
         </div>
       </header>
 
-      <section className="container max-w-screen-2xl py-6">
+      <section className="py-6 px-4">
         <Tags
           tags={selectedProject.alm}
           name={selectedProject.name}
@@ -72,7 +72,7 @@ const ProjectDetails = ({
 
       <Separator className="mb-6" />
 
-      <section className="container flex-1 max-w-screen-2xl pb-6">
+      <section className="flex-1 pb-6">
         <div className="grid grid-cols-2 h-[calc(100vh-16rem)] min-h-[400px]">
           <FolderView
             project={selectedProject}
