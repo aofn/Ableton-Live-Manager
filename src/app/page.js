@@ -19,6 +19,7 @@ import { open } from "@tauri-apps/api/shell";
 import ProjectDetails from "@/components/ProjectDetails";
 import { TouchBackend } from "react-dnd-touch-backend";
 import { DndProvider } from "react-dnd";
+import CustomDragLayer from "@/components/CustomDragLayer";
 
 /**
  * Displays a progress bar while scanning the project directory.
@@ -249,8 +250,10 @@ export default function Home() {
           enableMouseEvents: true,
           enableTouchEvents: true,
           preventDefaultTouchStart: true,
+          delayTouchStart: 100, // Add a small delay to help distinguish between taps and drags
         }}
       >
+        <CustomDragLayer />
         <SidebarProvider>
           <AppSidebar
             projects={directoryEntries}
