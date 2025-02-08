@@ -1,55 +1,24 @@
 "use client";
 
-import ProjectItem from "@/components/ProjectItem";
 import { useEffect, useState } from "react";
-import Settings from "@/components/Settings";
 import {
   BaseDirectory,
   readDir,
   readTextFile,
   writeTextFile,
 } from "@tauri-apps/api/fs";
-import { Input } from "@/components/ui/input";
-import { NavigationMenu } from "@/components/ui/navigation-menu";
-import { Separator } from "@radix-ui/react-menubar";
 import { Progress } from "@/components/ui/progress";
-import Select from "react-select";
 import { invoke } from "@tauri-apps/api/tauri";
-import { ThemeToggle } from "@/components/ThemeToggle";
-import { Button } from "@/components/ui/button";
-import { EyeClosedIcon, OpenInNewWindowIcon } from "@radix-ui/react-icons";
 import { useTranslation } from "react-i18next";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 import { badgeVariants } from "@/components/ui/badge";
 import "remixicon/fonts/remixicon.css";
-import _ from "lodash";
-import DropZone from "@/components/DropZone";
-import {
-  Sidebar,
-  SidebarContent,
-  SidebarGroup,
-  SidebarGroupContent,
-  SidebarGroupLabel,
-  SidebarHeader,
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
-  SidebarProvider,
-  SidebarTrigger,
-} from "@/components/ui/sidebar";
+import { SidebarProvider } from "@/components/ui/sidebar";
 import AppSidebar from "@/components/AppSidebar";
-import { CardDescription } from "@/components/ui/card";
 import { open } from "@tauri-apps/api/shell";
-import { Tags } from "@/components/Tags";
-import FolderView from "@/components/FolderView";
-import { RightColumn } from "@/components/RightColumn";
 import ProjectDetails from "@/components/ProjectDetails";
+import { TouchBackend } from "react-dnd-touch-backend";
+import { DndProvider } from "react-dnd";
 
 /**
  * Displays a progress bar while scanning the project directory.
@@ -79,7 +48,6 @@ function ProgressBar({ currentScanPath, currentScan, totalScan, value }) {
 }
 
 export default function Home() {
-  const [projectDirectory, setProjectDirectory] = useState("");
   const [directoryEntries, setDirectoryEntries] = useState([]);
   const [filterInput, setFilterInput] = useState("");
   const [currentScan, setCurrentScan] = useState(0);
@@ -89,7 +57,6 @@ export default function Home() {
   const [displayProgress, setDisplayProgress] = useState(false);
   const [config, setConfig] = useState({});
   const [filterByTags, setFilterByTags] = useState([]);
-  const [collapseAll, setCollapseAll] = useState(true);
   const [folders, setFolders] = useState([]);
   const [selectedProject, setSelectedProject] = useState("");
   const [xmpKeywords, setXmpKeywords] = useState([]);
@@ -275,35 +242,44 @@ export default function Home() {
     );
   return (
     <>
-      <SidebarProvider>
-        <AppSidebar
-          projects={directoryEntries}
-          onClick={setSelectedProject}
-          selectedProjectPath={selectedProject.path}
-          handleDelete={handleDeleteProject}
-          filterInput={filterInput}
-          config={config}
-          setConfig={setConfig}
-          handleAddingFolder={handleAddingFolder}
-        />
-        <main>
-          {selectedProject && (
-            <ProjectDetails
-              selectedProject={selectedProject}
-              open={open}
-              t={t}
-              config={config}
-              setConfig={setConfig}
-              setFilterByTags={setFilterByTags}
-              xmpKeywords={xmpKeywords}
-              setXmpKeywords={setXmpKeywords}
-              openDetails={openDetails}
-              setOpenDetails={setOpenDetails}
-            />
-          )}
-          <DropZone onFolderDrop={handleAddingFolder} />
-        </main>
-      </SidebarProvider>
+      {/*<DropZone onFolderDrop={handleAddingFolder} />*/}
+      <DndProvider
+        backend={TouchBackend}
+        options={{
+          enableMouseEvents: true,
+          enableTouchEvents: true,
+          preventDefaultTouchStart: true,
+        }}
+      >
+        <SidebarProvider>
+          <AppSidebar
+            projects={directoryEntries}
+            onClick={setSelectedProject}
+            selectedProjectPath={selectedProject.path}
+            handleDelete={handleDeleteProject}
+            filterInput={filterInput}
+            config={config}
+            setConfig={setConfig}
+            handleAddingFolder={handleAddingFolder}
+          />
+          <main>
+            {selectedProject && (
+              <ProjectDetails
+                selectedProject={selectedProject}
+                open={open}
+                t={t}
+                config={config}
+                setConfig={setConfig}
+                setFilterByTags={setFilterByTags}
+                xmpKeywords={xmpKeywords}
+                setXmpKeywords={setXmpKeywords}
+                openDetails={openDetails}
+                setOpenDetails={setOpenDetails}
+              />
+            )}
+          </main>
+        </SidebarProvider>
+      </DndProvider>
     </>
   );
 }
