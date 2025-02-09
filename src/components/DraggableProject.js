@@ -16,6 +16,7 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import ConfirmationDialog from "@/components/ConfirmationDialog";
 
 const DraggableProject = ({
   project,
@@ -112,45 +113,19 @@ const DraggableProject = ({
         )}
       </div>
 
-      <Dialog
-        open={isDeleteDialogOpen}
-        onOpenChange={(open) => {
-          if (!open) {
-            handleCancelDelete();
-          }
-        }}
+      <ConfirmationDialog
+        isOpen={isDeleteDialogOpen}
+        onClose={handleCancelDelete}
+        onConfirm={handleConfirmDelete}
+        title="Delete Project"
+        confirmText="Delete Project"
+        cancelText="Cancel"
+        variant="destructive"
       >
-        <DialogContent
-          onPointerDownOutside={(e) => {
-            e.preventDefault();
-          }}
-        >
-          <DialogHeader>
-            <DialogTitle>Delete Project</DialogTitle>
-            <DialogDescription>
-              Are you sure you want to delete &#34;{project.name}&#34; from the
-              application? This action will remove the project from all groups
-              and cannot be undone.
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter className="flex gap-2 mt-4">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={handleCancelDelete}
-            >
-              Cancel
-            </Button>
-            <Button
-              type="button"
-              variant="destructive"
-              onClick={handleConfirmDelete}
-            >
-              Delete Project
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+        Are you sure you want to delete &quot;{project.name}&quot; from the
+        application? This action will remove the project from all groups and
+        cannot be undone.
+      </ConfirmationDialog>
     </>
   );
 };
