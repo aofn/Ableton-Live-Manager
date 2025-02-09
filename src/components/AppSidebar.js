@@ -12,8 +12,9 @@ import {
 } from "@/components/ui/sidebar";
 
 import React, { useState, useEffect } from "react";
-import { PlusIcon } from "@radix-ui/react-icons";
+import { PlusIcon, ChevronDownIcon } from "@radix-ui/react-icons";
 import { useTranslation } from "react-i18next";
+import { cn } from "@/lib/utils";
 import Settings from "@/components/Settings";
 import { writeTextFile } from "@tauri-apps/api/fs";
 import { BaseDirectory } from "@tauri-apps/api/fs";
@@ -31,6 +32,8 @@ const AppSidebar = ({
   const [groups, setGroups] = useState(config.groups || []);
   const [newGroupName, setNewGroupName] = useState("");
   const [toggleCreateGroup, setToggleCreateGroup] = useState(false);
+  const [isGroupsCollapsed, setIsGroupsCollapsed] = useState(false);
+  const [isProjectsCollapsed, setIsProjectsCollapsed] = useState(false);
   const { t } = useTranslation();
 
   useEffect(() => {
@@ -65,7 +68,6 @@ const AppSidebar = ({
 
     const updatedGroups = groups.map((group) => {
       if (group.name === groupName) {
-        // Check if project already exists in group
         const projectExists = group.projects.some(
           (p) => p.path === project.path,
         );
@@ -118,68 +120,96 @@ const AppSidebar = ({
             handleAddingFolder={handleAddingFolder}
           />
         </SidebarHeader>
-        <SidebarGroupLabel>{t("Groups")}</SidebarGroupLabel>
-        {groups.length > 0 && (
+        <div
+          className="flex items-center cursor-pointer"
+          onClick={() => setIsGroupsCollapsed(!isGroupsCollapsed)}
+        >
+          <ChevronDownIcon
+            className={cn(
+              "h-3 w-3 shrink-0 transition-transform duration-200",
+              !isGroupsCollapsed ? "rotate-0" : "-rotate-90",
+            )}
+          />
+          <SidebarGroupLabel>{t("Groups")}</SidebarGroupLabel>
+        </div>
+        {!isGroupsCollapsed && (
+          <>
+            {groups.length > 0 && (
+              <SidebarGroup>
+                <SidebarMenu className="list-none">
+                  {groups.map((group) => (
+                    <CollapsibleGroup
+                      key={group.name}
+                      group={group}
+                      handleAddProjectToGroup={handleAddProjectToGroup}
+                      onClick={onClick}
+                      selectedProjectPath={selectedProjectPath}
+                      config={config}
+                      setConfig={setConfig}
+                      updateConfigFile={updateConfigFile}
+                    />
+                  ))}
+                </SidebarMenu>
+              </SidebarGroup>
+            )}
+            <SidebarGroup className="list-none text-muted-foreground">
+              <SidebarMenuItem>
+                {toggleCreateGroup ? (
+                  <>
+                    <SidebarInput
+                      placeholder={t("New Group Name")}
+                      value={newGroupName}
+                      autoFocus
+                      onChange={(e) => setNewGroupName(e.target.value)}
+                      onBlur={() => setToggleCreateGroup(false)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                          handleAddGroup();
+                          setToggleCreateGroup(false);
+                        }
+                      }}
+                    />
+                  </>
+                ) : (
+                  <SidebarMenuButton
+                    onClick={() => setToggleCreateGroup(true)}
+                    className="flex justify-between w-full"
+                  >
+                    <span>{t("Create New Group")}</span>
+                    <PlusIcon />
+                  </SidebarMenuButton>
+                )}
+              </SidebarMenuItem>
+            </SidebarGroup>
+          </>
+        )}
+        <SidebarSeparator />
+        <div
+          className="flex items-center cursor-pointer"
+          onClick={() => setIsProjectsCollapsed(!isProjectsCollapsed)}
+        >
+          <ChevronDownIcon
+            className={cn(
+              "h-3 w-3 shrink-0 transition-transform duration-200",
+              !isProjectsCollapsed ? "rotate-0" : "-rotate-90",
+            )}
+          />
+          <SidebarGroupLabel>{t("Projects")}</SidebarGroupLabel>
+        </div>
+        {!isProjectsCollapsed && (
           <SidebarGroup>
             <SidebarMenu className="list-none">
-              {groups.map((group) => (
-                <CollapsibleGroup
-                  key={group.name}
-                  group={group}
-                  handleAddProjectToGroup={handleAddProjectToGroup}
+              {projects.map((project) => (
+                <DraggableProject
+                  key={project.path}
+                  project={project}
                   onClick={onClick}
                   selectedProjectPath={selectedProjectPath}
-                  config={config}
-                  setConfig={setConfig}
-                  updateConfigFile={updateConfigFile}
                 />
               ))}
             </SidebarMenu>
           </SidebarGroup>
         )}
-        <SidebarGroup className="list-none text-muted-foreground">
-          <SidebarMenuItem>
-            {toggleCreateGroup ? (
-              <>
-                <SidebarInput
-                  placeholder={t("New Group Name")}
-                  value={newGroupName}
-                  autoFocus
-                  onChange={(e) => setNewGroupName(e.target.value)}
-                  onBlur={() => setToggleCreateGroup(false)}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") {
-                      handleAddGroup();
-                      setToggleCreateGroup(false);
-                    }
-                  }}
-                />
-              </>
-            ) : (
-              <SidebarMenuButton
-                onClick={() => setToggleCreateGroup(true)}
-                className="flex justify-between w-full"
-              >
-                <span>{t("Create New Group")}</span>
-                <PlusIcon />
-              </SidebarMenuButton>
-            )}
-          </SidebarMenuItem>
-        </SidebarGroup>
-        <SidebarSeparator />
-        <SidebarGroupLabel>{t("Projects")}</SidebarGroupLabel>
-        <SidebarGroup>
-          <SidebarMenu className="list-none">
-            {projects.map((project) => (
-              <DraggableProject
-                key={project.path}
-                project={project}
-                onClick={onClick}
-                selectedProjectPath={selectedProjectPath}
-              />
-            ))}
-          </SidebarMenu>
-        </SidebarGroup>
       </SidebarContent>
     </Sidebar>
   );
