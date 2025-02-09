@@ -10,17 +10,8 @@ const DroppableGroup = ({
   const [{ isOver, canDrop }, drop] = useDrop(
     () => ({
       accept: "PROJECT",
-      hover: (item, monitor) => {
-        // When item is being dragged over, ensure parent knows we're in a drop operation
-        if (monitor.isOver({ shallow: true })) {
-          group.isDropping = true;
-        } else {
-          group.isDropping = false;
-        }
-      },
       drop: (item, monitor) => {
         if (monitor.didDrop()) {
-          group.isDropping = false;
           return;
         }
 
@@ -31,7 +22,6 @@ const DroppableGroup = ({
         onDrop && onDrop();
 
         // Reset the dropping state after the drop
-        group.isDropping = false;
 
         return { dropped: true };
       },
