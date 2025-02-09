@@ -8,7 +8,6 @@ export const RightColumn = ({
   openDetails,
   setOpenDetails,
   almFile,
-  setAlmFile,
 }) => {
   return (
     <div className="flex-1">
@@ -23,14 +22,9 @@ export const RightColumn = ({
             name={name}
             onClose={() => setOpenDetails(false)}
             almFile={almFile}
-            setAlmFile={setAlmFile}
           />
         ) : (
-          <Notes
-            projectDirectory={projectDirectory}
-            almFile={almFile}
-            setAlmFile={setAlmFile}
-          />
+          <Notes projectDirectory={projectDirectory} notes={almFile?.notes} />
         )}
       </div>
     </div>

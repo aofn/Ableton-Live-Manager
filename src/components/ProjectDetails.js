@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { CardDescription } from "@/components/ui/card";
 import {
   Tooltip,
@@ -12,6 +12,7 @@ import { Tags } from "@/components/Tags";
 import FolderView from "@/components/FolderView";
 import { RightColumn } from "@/components/RightColumn";
 import { open } from "@tauri-apps/api/shell";
+import { readTextFile } from "@tauri-apps/api/fs";
 
 const ProjectDetails = ({
   selectedProject,
@@ -85,7 +86,6 @@ const ProjectDetails = ({
               openDetails={openDetails}
               name={selectedProject.name}
               almFile={selectedProject.alm}
-              setAlmFile={() => console.log("setAlmFile")}
               projectDirectory={selectedProject.path}
               setOpenDetails={setOpenDetails}
             />

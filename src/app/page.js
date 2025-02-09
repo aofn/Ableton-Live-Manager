@@ -62,6 +62,7 @@ export default function Home() {
   const [selectedProject, setSelectedProject] = useState("");
   const [xmpKeywords, setXmpKeywords] = useState([]);
   const [openDetails, setOpenDetails] = useState(false);
+  const [almData, setAlmData] = useState({});
 
   const { t } = useTranslation();
   const colourStyles = {
@@ -77,7 +78,6 @@ export default function Home() {
     }),
     multiValueLabel: (styles, { data }) => ({
       ...styles,
-
       color:
         data.variant === "default" || data.variant === "destructive"
           ? "white"
@@ -95,11 +95,9 @@ export default function Home() {
     multiValueRemove: (state) => {
       return cn(badgeVariants({ variant: state.data.variant }));
     },
-    // option: ({ isDisabled, isFocused, isSelected }) => "bg-background",
   };
 
   useEffect(() => {
-    // setProjectDirectory(config?.directoryPath);
     setFolders(config?.directories);
   }, [config]);
 
@@ -118,11 +116,6 @@ export default function Home() {
 
       for (let [i, entry] of copyOfFolders.entries()) {
         if (!entry.path) continue;
-
-        // const entries = await readDir(entry.path, {
-        //   directory: true,
-        //   recursive: true,
-        // });
 
         setCurrentScan(i);
         const percentage = (i / folders.length) * 100;
@@ -146,6 +139,10 @@ export default function Home() {
             if (child.path.endsWith("alm.json")) {
               const almFile = await readTextFile(child.path);
               entry.alm = JSON.parse(almFile);
+              setAlmData((prevAlmData) => ({
+                ...prevAlmData,
+                [child.path]: entry.alm,
+              }));
             }
 
             if (child.path.endsWith(".als")) {
@@ -210,19 +207,13 @@ export default function Home() {
   };
 
   const handleDeleteProject = async (projectPath) => {
-    // Update the directoryEntries state
-    console.log(folders);
-    console.log(projectPath);
-    setFolders((prevEntries) =>
-      prevEntries.filter((entry) => entry.path !== projectPath.path),
+    const updatedDirectories = config.directories.filter(
+      (entry) => entry.path !== projectPath.path,
     );
 
-    // Update the config state
     const updatedConfig = {
       ...config,
-      directories: config.directories.filter(
-        (dir) => dir.path !== projectPath.path,
-      ),
+      directories: updatedDirectories,
     };
 
     await writeTextFile("config.json", JSON.stringify(updatedConfig), {
@@ -237,6 +228,14 @@ export default function Home() {
     setOpenDetails(false);
   };
 
+  const writeAlmFile = async (path, data) => {
+    await writeTextFile(path, JSON.stringify(data, null, 2));
+    setAlmData((prevAlmData) => ({
+      ...prevAlmData,
+      [path]: data,
+    }));
+  };
+
   if (displayProgress)
     return (
       <ProgressBar
@@ -248,7 +247,6 @@ export default function Home() {
     );
   return (
     <>
-      {/*<DropZone onFolderDrop={handleAddingFolder} />*/}
       <DndProvider
         backend={TouchBackend}
         options={{
@@ -280,6 +278,8 @@ export default function Home() {
                 setXmpKeywords={setXmpKeywords}
                 openDetails={openDetails}
                 setOpenDetails={setOpenDetails}
+                almData={almData}
+                writeAlmFile={writeAlmFile}
               />
             )}
           </main>

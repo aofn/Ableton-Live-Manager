@@ -5,25 +5,10 @@ import Editor from "@/components/Editor/Editor";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import { writeTextFile } from "@tauri-apps/api/fs";
 
-const Notes = ({ projectDirectory, almFile, setAlmFile }) => {
-  const [notes, setNotes] = useState(almFile?.notes || "");
+const Notes = ({ projectDirectory, notes: parsedNotes, setAlmFile }) => {
+  const [notes, setNotes] = useState(parsedNotes || "");
   const [loading, setLoading] = useState(false);
-
-  useEffect(() => {
-    let isMounted = true;
-    const getNotes = async () => {
-      setLoading(true);
-      if (almFile && almFile.notes) {
-        setNotes(almFile.notes);
-      }
-      setLoading(false);
-    };
-    if (almFile && isMounted) getNotes();
-
-    return () => {
-      isMounted = false;
-    };
-  }, [almFile]);
+  console.log(parsedNotes);
 
   const onSave = async (editedNote) => {
     // if no changes have been made we don't want to do anything
