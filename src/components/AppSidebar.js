@@ -58,8 +58,6 @@ const AppSidebar = ({
   };
 
   const handleAddProjectToGroup = async (groupName, project) => {
-    console.log("handleAddProjectToGroup called with:", { groupName, project });
-
     if (!groupName || !project) {
       console.error("Missing required data:", { groupName, project });
       return;
@@ -67,7 +65,6 @@ const AppSidebar = ({
 
     const updatedGroups = groups.map((group) => {
       if (group.name === groupName) {
-        console.log("Found matching group:", group.name);
         // Check if project already exists in group
         const projectExists = group.projects.some(
           (p) => p.path === project.path,
