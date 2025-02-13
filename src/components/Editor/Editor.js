@@ -7,11 +7,12 @@ import ListItem from "@tiptap/extension-list-item";
 import TextStyle from "@tiptap/extension-text-style";
 import { EditorProvider, useCurrentEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
-import React from "react";
+import React, { useCallback, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 
 import Placeholder from "@tiptap/extension-placeholder";
 import { Image } from "@tiptap/extension-image";
+import { debounce } from "lodash";
 
 //@TODO Headlines not working for some reason.
 const EditorButton = ({
@@ -141,18 +142,17 @@ const MenuBar = () => {
     </section>
   );
 };
-
 const extensions = [
   Color.configure({ types: [TextStyle.name, ListItem.name] }),
   TextStyle.configure({ types: [ListItem.name] }),
   StarterKit.configure({
     bulletList: {
       keepMarks: true,
-      keepAttributes: false, // TODO : Making this as `false` becase marks are not preserved when I try to preserve attrs, awaiting a bit of help
+      keepAttributes: false,
     },
     orderedList: {
       keepMarks: true,
-      keepAttributes: false, // TODO : Making this as `false` becase marks are not preserved when I try to preserve attrs, awaiting a bit of help
+      keepAttributes: false,
     },
   }),
   Placeholder.configure({
@@ -161,20 +161,39 @@ const extensions = [
   Image,
 ];
 
-const Editor = ({ onSave, content }) => {
+const Editor = ({ onSave, content, disabled }) => {
+  const debouncedSave = useCallback(
+    debounce((html) => {
+      if (typeof onSave === "function") {
+        onSave(html);
+      }
+    }, 500),
+    [onSave],
+  );
+
+  useEffect(() => {
+    return () => {
+      debouncedSave.cancel();
+    };
+  }, [debouncedSave]);
+
   return (
     <EditorProvider
       slotBefore={<MenuBar />}
       extensions={extensions}
-      onUpdate={(editor) => {
-        onSave(editor.editor.getHTML());
+      onUpdate={({ editor }) => {
+        if (editor && typeof editor.getHTML === "function") {
+          debouncedSave(editor.getHTML());
+        }
       }}
+      content={content || ""}
+      // Remove editable from editorProps and place it here at the root level
+      editable={!disabled}
       editorProps={{
         attributes: {
           class: "h-full min-h-[300px] focus:outline-none p-3",
         },
       }}
-      content={content}
     ></EditorProvider>
   );
 };

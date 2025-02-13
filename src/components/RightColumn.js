@@ -1,7 +1,5 @@
-import React from "react";
 import AlsInfo from "@/components/AlsInfo";
 import Notes from "@/components/Notes";
-
 export const RightColumn = ({
   projectDirectory,
   name,
@@ -9,6 +7,8 @@ export const RightColumn = ({
   setOpenDetails,
   almFile,
 }) => {
+  console.log("RightColumn projectDirectory:", projectDirectory); // Debug log
+
   return (
     <div className="flex-1">
       <div
@@ -24,7 +24,7 @@ export const RightColumn = ({
             almFile={almFile}
           />
         ) : (
-          <Notes projectDirectory={projectDirectory} notes={almFile?.notes} />
+          <Notes projectDirectory={projectDirectory} />
         )}
       </div>
     </div>

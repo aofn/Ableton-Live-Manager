@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
+import { useAlmFile } from "@/components/hooks/useAlmFile";
 import { CardDescription } from "@/components/ui/card";
 import {
   Tooltip,
@@ -11,8 +12,6 @@ import { Separator } from "@/components/ui/separator";
 import { Tags } from "@/components/Tags";
 import FolderView from "@/components/FolderView";
 import { RightColumn } from "@/components/RightColumn";
-import { open } from "@tauri-apps/api/shell";
-import { readTextFile } from "@tauri-apps/api/fs";
 
 const ProjectDetails = ({
   selectedProject,
@@ -26,6 +25,8 @@ const ProjectDetails = ({
   openDetails,
   setOpenDetails,
 }) => {
+  const { almData, isLoading } = useAlmFile(selectedProject.path);
+
   const handleOpenProject = async (path) => {
     if (path.endsWith(".als")) setOpenDetails(path);
     else await open(path);
@@ -59,9 +60,9 @@ const ProjectDetails = ({
 
       <section className="py-4 px-4">
         <Tags
-          tags={selectedProject.alm}
+          tags={almData}
           name={selectedProject.name}
-          almFile={selectedProject.alm}
+          almFile={almData}
           projectDirectory={selectedProject.path}
           config={config}
           setConfig={setConfig}
@@ -77,7 +78,7 @@ const ProjectDetails = ({
         <div className="grid grid-cols-2 h-full">
           <FolderView
             project={selectedProject}
-            almFile={selectedProject.alm}
+            almFile={almData}
             handleOpenProject={handleOpenProject}
           />
           <div className="flex">
@@ -85,7 +86,7 @@ const ProjectDetails = ({
             <RightColumn
               openDetails={openDetails}
               name={selectedProject.name}
-              almFile={selectedProject.alm}
+              almFile={almData}
               projectDirectory={selectedProject.path}
               setOpenDetails={setOpenDetails}
             />
