@@ -219,7 +219,9 @@ export default function Home() {
     await writeTextFile("config.json", JSON.stringify(updatedConfig), {
       dir: BaseDirectory.Data,
     });
-
+    if (selectedProject.path === projectPath.path) {
+      setSelectedProject("");
+    }
     setConfig(updatedConfig);
   };
 

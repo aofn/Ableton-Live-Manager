@@ -27,6 +27,7 @@ const AppSidebar = ({
   selectedProjectPath,
   config,
   setConfig,
+  handleDelete,
   handleAddingFolder,
 }) => {
   const [groups, setGroups] = useState(config.groups || []);
@@ -204,6 +205,7 @@ const AppSidebar = ({
                 <DraggableProject
                   key={project.path}
                   project={project}
+                  onDelete={handleDelete}
                   onClick={onClick}
                   selectedProjectPath={selectedProjectPath}
                 />
