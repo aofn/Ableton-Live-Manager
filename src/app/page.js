@@ -20,6 +20,7 @@ import ProjectDetails from "@/components/ProjectDetails";
 import { TouchBackend } from "react-dnd-touch-backend";
 import { DndProvider } from "react-dnd";
 import CustomDragLayer from "@/components/CustomDragLayer";
+import DropZone from "@/components/DropZone";
 
 /**
  * Displays a progress bar while scanning the project directory.
@@ -287,6 +288,7 @@ export default function Home() {
           </main>
         </SidebarProvider>
       </DndProvider>
+      <DropZone onFolderDrop={handleAddingFolder} />
     </>
   );
 }
