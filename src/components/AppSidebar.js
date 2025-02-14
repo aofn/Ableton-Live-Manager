@@ -157,6 +157,7 @@ const AppSidebar = ({
                 {toggleCreateGroup ? (
                   <>
                     <SidebarInput
+                      className="text-xs"
                       placeholder={t("New Group Name")}
                       value={newGroupName}
                       autoFocus
@@ -173,7 +174,7 @@ const AppSidebar = ({
                 ) : (
                   <SidebarMenuButton
                     onClick={() => setToggleCreateGroup(true)}
-                    className="flex justify-between w-full"
+                    className="flex justify-between w-full text-xs"
                   >
                     <span>{t("Create New Group")}</span>
                     <PlusIcon />
