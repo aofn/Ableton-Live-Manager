@@ -10,6 +10,8 @@ jobs:
     steps:
     - name: Checkout repository
       uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
 
     - name: Get the latest release version
       id: get_release
@@ -25,6 +27,8 @@ jobs:
       run: |
         git config --global user.name 'github-actions'
         git config --global user.email 'github-actions@github.com'
+        git checkout main
+        git pull origin main
         git add README.md
         git commit -m "Update README with latest release version ${latest_version}"
-        git push
+        git push origin main
