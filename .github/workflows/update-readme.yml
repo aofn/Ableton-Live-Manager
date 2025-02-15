@@ -18,10 +18,11 @@ jobs:
       id: set_version
       run: |
         if [ "${{ github.event_name }}" = "release" ]; then
-          echo "tag=$(echo $GITHUB_REF | sed 's/refs\/tags\///')" >> $GITHUB_ENV
+          tag=$(echo $GITHUB_REF | sed 's/refs\/tags\///')
+          echo "tag=${tag#app-v}" >> $GITHUB_ENV
         else
           latest_tag=$(git describe --tags `git rev-list --tags --max-count=1`)
-          echo "tag=${latest_tag}" >> $GITHUB_ENV
+          echo "tag=${latest_tag#app-v}" >> $GITHUB_ENV
         fi
 
     - name: Print README before update
@@ -30,8 +31,8 @@ jobs:
     - name: Update README
       run: |
         latest_version=${{ env.tag }}
-        sed -i "s#releases/download/app-v[0-9.]*/Ableton.Live.Manager_[0-9.]*_universal.dmg#releases/download/app-v${latest_version}/Ableton.Live.Manager_${latest_version}_universal.dmg#g" README.md
-        sed -i "s#releases/download/app-v[0-9.]*/Ableton.Live.Manager_[0-9.]*_x64_en-US.msi#releases/download/app-v${latest_version}/Ableton.Live.Manager_${latest_version}_x64_en-US.msi#g" README.md
+        sed -i "s#https://github.com/aofn/Ableton-Live-Manager/releases/download/app-v[0-9.]*/Ableton.Live.Manager_[0-9.]*_universal.dmg#https://github.com/aofn/Ableton-Live-Manager/releases/download/app-v${latest_version}/Ableton.Live.Manager_${latest_version}_universal.dmg#g" README.md
+        sed -i "s#https://github.com/aofn/Ableton-Live-Manager/releases/download/app-v[0-9.]*/Ableton.Live.Manager_[0-9.]*_x64_en-US.msi#https://github.com/aofn/Ableton-Live-Manager/releases/download/app-v${latest_version}/Ableton.Live.Manager_${latest_version}_x64_en-US.msi#g" README.md
 
     - name: Print README after update
       run: cat README.md
