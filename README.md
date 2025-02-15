@@ -66,8 +66,8 @@ _Important: If you delete this file, all notes and tags of this project will be 
 
 So far the application has only been tested on macOS Sonoma!
 
-🍏 [Download for macOS](https://github.com/aofn/Ableton-Live-Manager/releases/download/app-v0.8.0/Ableton.Live.Manager_0.8.0_universal.dmg)
-🪟 [Download for Windows](https://github.com/aofn/Ableton-Live-Manager/releases/download/app-v0.8.0/Ableton.Live.Manager_0.8.0_x64_en-US.msi)
+🍏 [Download for macOS](https://github.com/aofn/Ableton-Live-Manager/releases/download/app-vapp-v0.9.1/Ableton.Live.Manager_app-v0.9.1_universal.dmg)
+🪟 [Download for Windows](https://github.com/aofn/Ableton-Live-Manager/releases/download/app-vapp-v0.9.1/Ableton.Live.Manager_app-v0.9.1_x64_en-US.msi)
 
 You can find all releases here: https://github.com/aofn/Ableton-Live-Manager/releases/
 
