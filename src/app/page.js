@@ -21,6 +21,15 @@ import { TouchBackend } from "react-dnd-touch-backend";
 import { DndProvider } from "react-dnd";
 import CustomDragLayer from "@/components/CustomDragLayer";
 import DropZone from "@/components/DropZone";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Button } from "@/components/ui/button";
 
 /**
  * Displays a progress bar while scanning the project directory.
@@ -48,7 +57,6 @@ function ProgressBar({ currentScanPath, currentScan, totalScan, value }) {
     </div>
   );
 }
-
 export default function Home() {
   const [directoryEntries, setDirectoryEntries] = useState([]);
   const [filterInput, setFilterInput] = useState("");
@@ -64,6 +72,9 @@ export default function Home() {
   const [xmpKeywords, setXmpKeywords] = useState([]);
   const [openDetails, setOpenDetails] = useState(false);
   const [almData, setAlmData] = useState({});
+  const [showDialog, setShowDialog] = useState(false);
+  const [showAlreadyAddedDialog, setShowAlreadyAddedDialog] = useState(false);
+  const [pendingFolder, setPendingFolder] = useState(null);
 
   const { t } = useTranslation();
   const colourStyles = {
@@ -152,7 +163,7 @@ export default function Home() {
           }
         }
       }
-
+      setDisplayProgress(false);
       if (isMounted) {
         setDirectoryEntries(copyOfFolders);
         setDisplayProgress(false);
@@ -195,6 +206,23 @@ export default function Home() {
       })),
     };
 
+    const containsAlsFile = folder.some((entry) => entry.path.endsWith(".als"));
+
+    if (config.directories?.some((dir) => dir.path === folderPath)) {
+      setShowAlreadyAddedDialog(true);
+      return;
+    }
+
+    if (!containsAlsFile) {
+      setPendingFolder(folderObject);
+      setShowDialog(true);
+      return;
+    }
+
+    addFolderToConfig(folderObject);
+  };
+
+  const addFolderToConfig = async (folderObject) => {
     const copyConfig = { ...config };
     if (!copyConfig.directories) {
       copyConfig.directories = [];
@@ -205,6 +233,19 @@ export default function Home() {
     await writeTextFile(`config.json`, JSON.stringify(copyConfig, null, 2), {
       dir: BaseDirectory.Data,
     });
+  };
+
+  const handleConfirmAddFolder = () => {
+    if (pendingFolder) {
+      addFolderToConfig(pendingFolder);
+      setPendingFolder(null);
+    }
+    setShowDialog(false);
+  };
+
+  const handleCancelAddFolder = () => {
+    setPendingFolder(null);
+    setShowDialog(false);
   };
 
   const handleDeleteProject = async (projectPath) => {
@@ -220,10 +261,13 @@ export default function Home() {
     await writeTextFile("config.json", JSON.stringify(updatedConfig), {
       dir: BaseDirectory.Data,
     });
+
+    setConfig(updatedConfig);
+    setDirectoryEntries(updatedDirectories);
+
     if (selectedProject.path === projectPath.path) {
       setSelectedProject("");
     }
-    setConfig(updatedConfig);
   };
 
   const handleSideBarClick = (project) => {
@@ -292,6 +336,61 @@ export default function Home() {
           </main>
         </div>
       </SidebarProvider>
+      <Dialog open={showDialog} onOpenChange={setShowDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>
+              {t("Folder does not contain an Ableton project file")}
+            </DialogTitle>
+          </DialogHeader>
+          <DialogDescription>
+            <Alert variant="destructive">
+              <AlertDescription>
+                {t(
+                  "The folder you are trying to add does not contain any .als files. Are you sure you want to add it?",
+                )}
+              </AlertDescription>
+            </Alert>
+            <div className="flex justify-end mt-4">
+              <Button variant="outline" onClick={handleCancelAddFolder}>
+                {t("Cancel")}
+              </Button>
+              <Button
+                variant="primary"
+                onClick={handleConfirmAddFolder}
+                className="ml-2"
+              >
+                {t("Add Folder")}
+              </Button>
+            </div>
+          </DialogDescription>
+        </DialogContent>
+      </Dialog>
+      <Dialog
+        open={showAlreadyAddedDialog}
+        onOpenChange={setShowAlreadyAddedDialog}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{t("Folder already added")}</DialogTitle>
+          </DialogHeader>
+          <DialogDescription>
+            <Alert>
+              <AlertDescription>
+                {t("The folder you are trying to add is already in the list.")}
+              </AlertDescription>
+            </Alert>
+            <div className="flex justify-end mt-4">
+              <Button
+                variant="primary"
+                onClick={() => setShowAlreadyAddedDialog(false)}
+              >
+                {t("OK")}
+              </Button>
+            </div>
+          </DialogDescription>
+        </DialogContent>
+      </Dialog>
     </DndProvider>
   );
 }
