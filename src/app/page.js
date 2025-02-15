@@ -44,6 +44,7 @@ import { Button } from "@/components/ui/button";
  * @TODO define scope properly
  * @TODO open projects in separate tabs
  * @TODO fix dark mode
+ * @TODO create single component for dialogs scattered across the app
  */
 
 function ProgressBar({ currentScanPath, currentScan, totalScan, value }) {
