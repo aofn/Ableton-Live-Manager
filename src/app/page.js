@@ -249,15 +249,15 @@ export default function Home() {
       />
     );
   return (
-    <>
-      <DndProvider
-        backend={TouchBackend}
-        options={{
-          enableMouseEvents: true,
-        }}
-      >
-        <CustomDragLayer />
-        <SidebarProvider>
+    <DndProvider
+      backend={TouchBackend}
+      options={{
+        enableMouseEvents: true,
+      }}
+    >
+      <CustomDragLayer />
+      <SidebarProvider>
+        <div className="flex h-screen w-full">
           <AppSidebar
             projects={directoryEntries}
             onClick={handleSideBarClick}
@@ -268,8 +268,8 @@ export default function Home() {
             setConfig={setConfig}
             handleAddingFolder={handleAddingFolder}
           />
-          <main className="w-full">
-            {selectedProject && (
+          <main className="flex-1 flex flex-col h-full">
+            {selectedProject ? (
               <ProjectDetails
                 selectedProject={selectedProject}
                 open={open}
@@ -284,11 +284,14 @@ export default function Home() {
                 almData={almData}
                 writeAlmFile={writeAlmFile}
               />
+            ) : (
+              <div className="flex-1 flex items-center justify-center">
+                <DropZone onFolderDrop={handleAddingFolder} />
+              </div>
             )}
           </main>
-        </SidebarProvider>
-      </DndProvider>
-      <DropZone onFolderDrop={handleAddingFolder} />
-    </>
+        </div>
+      </SidebarProvider>
+    </DndProvider>
   );
 }
