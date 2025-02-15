@@ -2,7 +2,7 @@
 
 This project is a tool designed to help manage Ableton Live projects.
 
-![alm-example](https://github.com/aofn/Ableton-Live-Manager/assets/79279756/4708841e-0304-4936-903f-bab795f3a146)
+<img width="1177" alt="ableton-live-manager-screenshot" src="https://github.com/user-attachments/assets/6c258e1c-79a7-48f2-9088-a49e290b0a52" />
 
 
 ## Features
