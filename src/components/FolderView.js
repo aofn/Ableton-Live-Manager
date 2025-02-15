@@ -22,7 +22,8 @@ const FolderView = ({ project, handleOpenProject, almFile }) => {
             if (
               child.name === "Icon\r" ||
               child.name.endsWith(".md") ||
-              child.name.endsWith(".json")
+              child.name.endsWith(".json") ||
+              child.name === ".DS_Store"
             ) {
               return null;
             }

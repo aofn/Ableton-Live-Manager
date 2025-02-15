@@ -7,12 +7,18 @@ This project is a tool designed to help manage Ableton Live projects.
 
 ## Features
 
-- Scan and display Ableton Live project files.
+- Advanced project organization with collapsible groups and sections for Ableton Live projects.
 - Drag & Drop project folder onto the application to add them or add them manually via Settings.
-- Add notes and tags to projects.
-- Search projects by name and/or filter by tags.
-- View project details such as tempo, number of tracks, used 3rd party plugins.
-- Remove 3rd Party Plugins from projects and save as a copy.
+- Smart project management:
+    - Add notes and tags to projects
+    - Search projects by name and/or filter by tags
+    - View project details (tempo, track count, used plugins)
+    - Remove 3rd Party Plugins from projects and save as a copy
+
+### Groups and Sections
+- Create custom groups to organize your projects
+- Collapsible sections for better workspace management
+- Drag and drop projects between groups
 
 ## Notes
 
@@ -33,10 +39,12 @@ You can creat your own tags and add them to projects. Tags come in four variants
 When adding tags to a project, the tags get saved inside the `alm.json` file's `tags` key.
 Tags created with Ableton 12 are also displayed in the application.
 
-## Removing 3rd Party Plugins
+## Managing Plugins
+
+### Removing 3rd Party Plugins
 
 You can remove third party plugins from your project and save it as a copy. This can be useful for example with older Project files, which might contain corrupted plugins that crash Ableton Live.
-The application will scan the project for third party plugins and display them in a list. You can then select which plugins you want to remove and save the project as a copy. 
+The application will scan the project for third party plugins and display them in a list. You can then select which plugins you want to remove and save the project as a copy.
 
 **The original project will not be modified!**
 
