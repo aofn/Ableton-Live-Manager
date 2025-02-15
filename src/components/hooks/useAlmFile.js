@@ -1,14 +1,16 @@
-import { useCallback, useState, useEffect } from "react";
-import { writeTextFile, readTextFile, exists } from "@tauri-apps/api/fs";
+import { useState, useCallback, useEffect } from "react";
+import { exists, readTextFile, writeTextFile } from "@tauri-apps/api/fs";
 
 const DEFAULT_ALM_DATA = {
   notes: "",
+  tags: {},
 };
 
 export function useAlmFile(projectPath) {
   const [almData, setAlmData] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [xmpKeywords, setXmpKeywords] = useState([]);
 
   const readAlmFile = useCallback(async () => {
     setIsLoading(true);
@@ -19,37 +21,35 @@ export function useAlmFile(projectPath) {
       }
 
       const almPath = `${projectPath}/alm.json`;
-      console.log("Checking file at:", almPath); // Debug log
+      console.log("Checking file at:", almPath);
 
-      // Check if file exists
       const fileExists = await exists(almPath);
 
       if (!fileExists) {
-        console.log("alm.json not found, creating new file"); // Debug log
+        console.log("alm.json not found, creating new file");
         await writeTextFile(almPath, JSON.stringify(DEFAULT_ALM_DATA, null, 2));
         setAlmData(DEFAULT_ALM_DATA);
         return DEFAULT_ALM_DATA;
       }
 
-      console.log("Reading existing file from:", almPath); // Debug log
+      console.log("Reading existing file from:", almPath);
       const content = await readTextFile(almPath);
-      console.log("File content:", content); // Debug log
+      console.log("File content:", content);
 
       let parsed;
       try {
         parsed = JSON.parse(content);
-        console.log("Parsed content:", parsed); // Debug log
+        console.log("Parsed content:", parsed);
       } catch (parseError) {
         console.error("Failed to parse alm.json:", parseError);
         parsed = DEFAULT_ALM_DATA;
-        // If parsing fails, overwrite with default data
         await writeTextFile(almPath, JSON.stringify(DEFAULT_ALM_DATA, null, 2));
       }
 
       setAlmData(parsed);
       return parsed;
     } catch (err) {
-      console.error("Error handling alm.json:", err); // Debug log
+      console.error("Error handling alm.json:", err);
       setError(err);
       return DEFAULT_ALM_DATA;
     } finally {
@@ -66,9 +66,8 @@ export function useAlmFile(projectPath) {
         }
 
         const almPath = `${projectPath}/alm.json`;
-        console.log("Writing to:", almPath); // Debug log
+        console.log("Writing to:", almPath);
 
-        // Get current data or create new file if it doesn't exist
         let currentData;
         const fileExists = await exists(almPath);
         if (!fileExists) {
@@ -78,13 +77,13 @@ export function useAlmFile(projectPath) {
         }
 
         const newData = { ...currentData, ...updates };
-        console.log("Writing data:", newData); // Debug log
+        console.log("Writing data:", newData);
 
         await writeTextFile(almPath, JSON.stringify(newData, null, 2));
         setAlmData(newData);
         return newData;
       } catch (err) {
-        console.error("Error writing alm.json:", err); // Debug log
+        console.error("Error writing alm.json:", err);
         setError(err);
         throw err;
       }
@@ -94,13 +93,40 @@ export function useAlmFile(projectPath) {
 
   const updateNotes = useCallback(
     async (notes) => {
-      console.log("Updating notes:", notes); // Debug log
       return writeAlmFile({ notes });
     },
     [writeAlmFile],
   );
 
-  // Add an initial load effect
+  // Tag Management Functions
+  const addTag = useCallback(
+    async (tag) => {
+      const currentTags = almData?.tags || {};
+      const newTags = {
+        ...currentTags,
+        [tag.value]: tag,
+      };
+      return writeAlmFile({ tags: newTags });
+    },
+    [almData, writeAlmFile],
+  );
+
+  const removeTag = useCallback(
+    async (tagKey) => {
+      if (!almData?.tags) return;
+      const newTags = { ...almData.tags };
+      delete newTags[tagKey];
+      return writeAlmFile({ tags: newTags });
+    },
+    [almData, writeAlmFile],
+  );
+
+  // XMP Keywords Management
+  const updateXmpKeywords = useCallback((keywords) => {
+    setXmpKeywords(keywords);
+  }, []);
+
+  // Initial load effects
   useEffect(() => {
     if (projectPath) {
       readAlmFile();
@@ -114,5 +140,9 @@ export function useAlmFile(projectPath) {
     readAlmFile,
     writeAlmFile,
     updateNotes,
+    addTag,
+    removeTag,
+    xmpKeywords,
+    updateXmpKeywords,
   };
 }
