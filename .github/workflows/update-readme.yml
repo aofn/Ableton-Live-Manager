@@ -14,10 +14,16 @@ jobs:
       with:
         fetch-depth: 0
 
-    - name: Get the latest release version
-      id: get_release
-      run: echo "tag=$(echo $GITHUB_REF | sed 's/refs\/tags\///')" >> $GITHUB_ENV
-      
+    - name: Set the latest release version
+      id: set_version
+      run: |
+        if [ "${{ github.event_name }}" = "release" ]; then
+          echo "tag=$(echo $GITHUB_REF | sed 's/refs\/tags\///')" >> $GITHUB_ENV
+        else
+          latest_tag=$(git describe --tags `git rev-list --tags --max-count=1`)
+          echo "tag=${latest_tag}" >> $GITHUB_ENV
+        fi
+
     - name: Update README
       run: |
         latest_version=${{ env.tag }}
