@@ -1,11 +1,18 @@
 import React, { useState, useEffect } from "react";
 import { listen } from "@tauri-apps/api/event";
-import { Dialog, DialogContent, DialogOverlay } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogOverlay,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { open } from "@tauri-apps/api/dialog";
 
 const DropZone = ({ onFolderDrop }) => {
   const [isDragging, setIsDragging] = useState(false);
   const [draggedFolderName, setDraggedFolderName] = useState("");
+  const dragCounter = React.useRef(0);
 
   useEffect(() => {
     const unlisten = listen("tauri://file-drop", async (event) => {
@@ -22,6 +29,9 @@ const DropZone = ({ onFolderDrop }) => {
           console.error("Error reading directory:", error);
         }
       }
+      // Reset drag state after drop
+      dragCounter.current = 0;
+      setIsDragging(false);
     });
 
     return () => {
@@ -29,15 +39,34 @@ const DropZone = ({ onFolderDrop }) => {
     };
   }, [onFolderDrop]);
 
-  const handleDragOver = (e) => {
+  const handleDragEnter = (e) => {
     e.preventDefault();
-    setIsDragging(true);
-    console.log("Drag over event triggered");
+    e.stopPropagation();
+    dragCounter.current++;
+    if (dragCounter.current === 1) {
+      setIsDragging(true);
+    }
   };
 
-  const handleDragLeave = () => {
+  const handleDragLeave = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    dragCounter.current--;
+    if (dragCounter.current === 0) {
+      setIsDragging(false);
+    }
+  };
+
+  const handleDragOver = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    dragCounter.current = 0;
     setIsDragging(false);
-    console.log("Drag leave event triggered");
   };
 
   const readDirectory = async () => {
@@ -55,8 +84,10 @@ const DropZone = ({ onFolderDrop }) => {
     <div className="w-full max-w-2xl p-8">
       <div
         onClick={readDirectory}
-        onDragOver={handleDragOver}
+        onDragEnter={handleDragEnter}
         onDragLeave={handleDragLeave}
+        onDragOver={handleDragOver}
+        onDrop={handleDrop}
         className="relative aspect-video w-full min-h-[300px] cursor-pointer"
       >
         <div
@@ -77,10 +108,13 @@ const DropZone = ({ onFolderDrop }) => {
       <Dialog open={isDragging} onOpenChange={setIsDragging}>
         <DialogOverlay />
         <DialogContent>
-          <p>
+          <DialogTitle>
             Drop the project to add <strong>{draggedFolderName}</strong> to the
             app
-          </p>
+          </DialogTitle>
+          <DialogDescription>
+            Drop to add to Ableton Live Manager
+          </DialogDescription>
         </DialogContent>
       </Dialog>
     </div>
