@@ -2,17 +2,23 @@
 
 This project is a tool designed to help manage Ableton Live projects.
 
-![alm-example](https://github.com/aofn/Ableton-Live-Manager/assets/79279756/4708841e-0304-4936-903f-bab795f3a146)
+<img width="1177" alt="ableton-live-manager-screenshot" src="https://github.com/user-attachments/assets/6c258e1c-79a7-48f2-9088-a49e290b0a52" />
 
 
 ## Features
 
-- Scan and display Ableton Live project files from a specified directory.
-- Add notes and tags to projects.
-- Search projects by name and/or filter by tags.
-- View project details such as tempo, number of tracks, used 3rd party plugins.
-- Remove 3rd Party Plugins from projects and save as a copy.
-- WIP: Pitch project up or down by a specified number of semitones and save as a copy.
+- Advanced project organization with collapsible groups and sections for Ableton Live projects.
+- Drag & Drop project folder onto the application to add them or add them manually via Settings.
+- Smart project management:
+    - Add notes and tags to projects
+    - Search projects by name and/or filter by tags
+    - View project details (tempo, track count, used plugins)
+    - Remove 3rd Party Plugins from projects and save as a copy
+
+### Groups and Sections
+- Create custom groups to organize your projects
+- Collapsible sections for better workspace management
+- Drag and drop projects between groups
 
 ## Notes
 
@@ -31,11 +37,14 @@ You can creat your own tags and add them to projects. Tags come in four variants
 * Important
 
 When adding tags to a project, the tags get saved inside the `alm.json` file's `tags` key.
+Tags created with Ableton 12 are also displayed in the application.
 
-## Removing 3rd Party Plugins
+## Managing Plugins
+
+### Removing 3rd Party Plugins
 
 You can remove third party plugins from your project and save it as a copy. This can be useful for example with older Project files, which might contain corrupted plugins that crash Ableton Live.
-The application will scan the project for third party plugins and display them in a list. You can then select which plugins you want to remove and save the project as a copy. 
+The application will scan the project for third party plugins and display them in a list. You can then select which plugins you want to remove and save the project as a copy.
 
 **The original project will not be modified!**
 
@@ -57,8 +66,8 @@ _Important: If you delete this file, all notes and tags of this project will be 
 
 So far the application has only been tested on macOS Sonoma!
 
-🍏 [Download for macOS](https://github.com/aofn/Ableton-Live-Manager/releases/download/app-v0.6.5/Ableton.Live.Manager_0.6.5b_x64.dmg)
-🪟 [Download for Windows](https://github.com/aofn/Ableton-Live-Manager/releases/download/app-v0.6.5/Ableton.Live.Manager_0.6.5b_x64_en-US.msi)
+🍏 [Download for macOS](https://github.com/aofn/Ableton-Live-Manager/releases/download/app-v0.8.0/Ableton.Live.Manager_0.8.0_universal.dmg)
+🪟 [Download for Windows](https://github.com/aofn/Ableton-Live-Manager/releases/download/app-v0.8.0/Ableton.Live.Manager_0.8.0_x64_en-US.msi)
 
 You can find all releases here: https://github.com/aofn/Ableton-Live-Manager/releases/
 

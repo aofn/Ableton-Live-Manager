@@ -1,5 +1,3 @@
-"use client";
-
 import React from "react";
 import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
@@ -11,87 +9,80 @@ import {
 } from "@/components/ui/tooltip";
 import { useTranslation } from "react-i18next";
 
-/**
- * Displays the contents of a project folder, including subprojects and files.
- * @component
- * @param {Object} project - The project object containing children.
- * @param {Function} handleOpenProject - Callback function to open a project.
- * @param {Object} almFile - The APM file associated with the project.
- * @returns {JSX.Element} - The JSX element representing the folder view.
- */
 const FolderView = ({ project, handleOpenProject, almFile }) => {
   return (
-    <Table>
-      <TableBody id="scrollable" className="overflow-y-auto h-full">
-        {project.children?.map((child) => {
-          if (
-            child.name === "Icon\r" ||
-            child.name.endsWith(".md") ||
-            child.name.endsWith(".json")
-          ) {
-            return null;
-          }
+    <div className="pr-6">
+      <Table>
+        <TableBody
+          id="scrollable"
+          className="overflow-y-auto"
+          style={{ maxHeight: "calc(100vh - 20rem)" }}
+        >
+          {project.children?.map((child) => {
+            if (
+              child.name === "Icon\r" ||
+              child.name.endsWith(".md") ||
+              child.name.endsWith(".json") ||
+              child.name === ".DS_Store"
+            ) {
+              return null;
+            }
 
-          return (
-            <DisplayProjectContents
-              name={child.name}
-              path={child.path}
-              almFile={almFile}
-              key={child.path}
-              handleOpenProject={handleOpenProject}
-            />
-          );
-        })}
-      </TableBody>
-    </Table>
+            return (
+              <DisplayProjectContents
+                name={child.name}
+                path={child.path}
+                almFile={almFile}
+                key={child.path}
+                handleOpenProject={handleOpenProject}
+              />
+            );
+          })}
+        </TableBody>
+      </Table>
+    </div>
   );
 };
-export default FolderView;
 
-/**
- * Displays the contents of a project file within a table row.
- * @component
- * @param {string} name - The name of the project file.
- * @param {string} path - The path to the project file.
- * @param {Function} handleOpenProject - Callback function to open a project.
- * @param {Object} almFile - The APM file associated with the project.
- * @returns {JSX.Element} - The JSX element representing the project file details.
- */
 const DisplayProjectContents = ({ name, path, handleOpenProject, almFile }) => {
   const { t } = useTranslation();
 
   const onOpen = React.useCallback(async () => {
     const { shell } = await import("@tauri-apps/api");
-
     await shell.open(path);
   }, [path]);
 
   return (
-    <TableRow className="w-full flex flex-row px-3">
-      <TableCell className="flex items-center w-full">
-        <Button
-          variant="link"
-          className="px-0"
-          onClick={() => handleOpenProject(path)}
-        >
-          {name}
-        </Button>
-        {almFile && almFile[name]?.bpm && (
-          <span className="text-sm text-muted-foreground px-1">
-            {almFile[name].bpm} BPM
-          </span>
-        )}
+    <TableRow className="hover:bg-muted/50 transition-colors">
+      <TableCell className="flex items-center justify-between py-2 px-4">
+        <div className="flex items-center gap-2 flex-1">
+          <Button
+            variant="ghost"
+            className="h-8 px-2 hover:bg-transparent hover:underline"
+            onClick={() => handleOpenProject(path)}
+          >
+            {name}
+          </Button>
+          {almFile && almFile[name]?.bpm && (
+            <span className="text-sm text-muted-foreground rounded-md bg-muted px-2 py-0.5">
+              {almFile[name].bpm} BPM
+            </span>
+          )}
+        </div>
         {name.endsWith(".als") && (
           <TooltipProvider>
             <Tooltip>
-              <TooltipTrigger className="ml-auto">
-                <img
+              <TooltipTrigger>
+                <button
                   onClick={() => onOpen(path)}
-                  height="20em"
-                  width="20em"
-                  src="/live_9_project_icon.png"
-                  alt="Ableton Live icon"
-                />
+                  className="rounded-md p-1 hover:bg-muted transition-colors"
+                >
+                  <img
+                    className="h-5 w-5"
+                    src="/live_9_project_icon.png"
+                    alt="Ableton Live icon"
+                  />
+                </button>
               </TooltipTrigger>
               <TooltipContent>{t("Open in Ableton")}</TooltipContent>
             </Tooltip>
@@ -101,3 +92,5 @@ const DisplayProjectContents = ({ name, path, handleOpenProject, almFile }) => {
     </TableRow>
   );
 };
+
+export default FolderView;

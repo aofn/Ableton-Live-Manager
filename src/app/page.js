@@ -1,35 +1,35 @@
 "use client";
 
-import ProjectItem from "@/components/ProjectItem";
 import { useEffect, useState } from "react";
-import Settings from "@/components/Settings";
 import {
   BaseDirectory,
   readDir,
   readTextFile,
   writeTextFile,
 } from "@tauri-apps/api/fs";
-import { Input } from "@/components/ui/input";
-import { NavigationMenu } from "@/components/ui/navigation-menu";
-import { Separator } from "@radix-ui/react-menubar";
 import { Progress } from "@/components/ui/progress";
-import Select from "react-select";
 import { invoke } from "@tauri-apps/api/tauri";
-import { ThemeToggle } from "@/components/ThemeToggle";
-import { Button } from "@/components/ui/button";
-import { EyeClosedIcon } from "@radix-ui/react-icons";
 import { useTranslation } from "react-i18next";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 import { badgeVariants } from "@/components/ui/badge";
 import "remixicon/fonts/remixicon.css";
-import _ from "lodash";
+import { SidebarProvider } from "@/components/ui/sidebar";
+import AppSidebar from "@/components/AppSidebar";
+import { open } from "@tauri-apps/api/shell";
+import ProjectDetails from "@/components/ProjectDetails";
+import { TouchBackend } from "react-dnd-touch-backend";
+import { DndProvider } from "react-dnd";
+import CustomDragLayer from "@/components/CustomDragLayer";
 import DropZone from "@/components/DropZone";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Button } from "@/components/ui/button";
 
 /**
  * Displays a progress bar while scanning the project directory.
@@ -44,6 +44,7 @@ import DropZone from "@/components/DropZone";
  * @TODO define scope properly
  * @TODO open projects in separate tabs
  * @TODO fix dark mode
+ * @TODO create single component for dialogs scattered across the app
  */
 
 function ProgressBar({ currentScanPath, currentScan, totalScan, value }) {
@@ -57,9 +58,7 @@ function ProgressBar({ currentScanPath, currentScan, totalScan, value }) {
     </div>
   );
 }
-
 export default function Home() {
-  const [projectDirectory, setProjectDirectory] = useState("");
   const [directoryEntries, setDirectoryEntries] = useState([]);
   const [filterInput, setFilterInput] = useState("");
   const [currentScan, setCurrentScan] = useState(0);
@@ -69,9 +68,15 @@ export default function Home() {
   const [displayProgress, setDisplayProgress] = useState(false);
   const [config, setConfig] = useState({});
   const [filterByTags, setFilterByTags] = useState([]);
-  const [collapseAll, setCollapseAll] = useState(true);
-  const [sortMethod, setSortMethod] = useState([]);
   const [folders, setFolders] = useState([]);
+  const [selectedProject, setSelectedProject] = useState("");
+  const [xmpKeywords, setXmpKeywords] = useState([]);
+  const [openDetails, setOpenDetails] = useState(false);
+  const [almData, setAlmData] = useState({});
+  const [showDialog, setShowDialog] = useState(false);
+  const [showAlreadyAddedDialog, setShowAlreadyAddedDialog] = useState(false);
+  const [pendingFolder, setPendingFolder] = useState(null);
+
   const { t } = useTranslation();
   const colourStyles = {
     option: (styles) => ({
@@ -86,7 +91,6 @@ export default function Home() {
     }),
     multiValueLabel: (styles, { data }) => ({
       ...styles,
-
       color:
         data.variant === "default" || data.variant === "destructive"
           ? "white"
@@ -104,11 +108,9 @@ export default function Home() {
     multiValueRemove: (state) => {
       return cn(badgeVariants({ variant: state.data.variant }));
     },
-    // option: ({ isDisabled, isFocused, isSelected }) => "bg-background",
   };
 
   useEffect(() => {
-    // setProjectDirectory(config?.directoryPath);
     setFolders(config?.directories);
   }, [config]);
 
@@ -127,11 +129,6 @@ export default function Home() {
 
       for (let [i, entry] of copyOfFolders.entries()) {
         if (!entry.path) continue;
-
-        // const entries = await readDir(entry.path, {
-        //   directory: true,
-        //   recursive: true,
-        // });
 
         setCurrentScan(i);
         const percentage = (i / folders.length) * 100;
@@ -155,6 +152,10 @@ export default function Home() {
             if (child.path.endsWith("alm.json")) {
               const almFile = await readTextFile(child.path);
               entry.alm = JSON.parse(almFile);
+              setAlmData((prevAlmData) => ({
+                ...prevAlmData,
+                [child.path]: entry.alm,
+              }));
             }
 
             if (child.path.endsWith(".als")) {
@@ -163,7 +164,7 @@ export default function Home() {
           }
         }
       }
-
+      setDisplayProgress(false);
       if (isMounted) {
         setDirectoryEntries(copyOfFolders);
         setDisplayProgress(false);
@@ -206,6 +207,23 @@ export default function Home() {
       })),
     };
 
+    const containsAlsFile = folder.some((entry) => entry.path.endsWith(".als"));
+
+    if (config.directories?.some((dir) => dir.path === folderPath)) {
+      setShowAlreadyAddedDialog(true);
+      return;
+    }
+
+    if (!containsAlsFile) {
+      setPendingFolder(folderObject);
+      setShowDialog(true);
+      return;
+    }
+
+    addFolderToConfig(folderObject);
+  };
+
+  const addFolderToConfig = async (folderObject) => {
     const copyConfig = { ...config };
     if (!copyConfig.directories) {
       copyConfig.directories = [];
@@ -218,35 +236,27 @@ export default function Home() {
     });
   };
 
-  // sort function to sort directoryEntries by tags within alm.tags key if alm key exists
-  const sortByTags = (a, b) => {
-    const aTags = a.alm?.tags ? Object.values(a.alm.tags) : [];
-    const bTags = b.alm?.tags ? Object.values(b.alm.tags) : [];
+  const handleConfirmAddFolder = () => {
+    if (pendingFolder) {
+      addFolderToConfig(pendingFolder);
+      setPendingFolder(null);
+    }
+    setShowDialog(false);
+  };
 
-    const sortedATags = _.sortBy(aTags, ["value", "label"]);
-    const sortedBTags = _.sortBy(bTags, ["value", "label"]);
-
-    const aTagsString = sortedATags.map((tag) => tag.value).join("");
-    const bTagsString = sortedBTags.map((tag) => tag.value).join("");
-
-    // * -1 reverses order so tags are on top of list
-    return aTagsString.localeCompare(bTagsString) * -1;
+  const handleCancelAddFolder = () => {
+    setPendingFolder(null);
+    setShowDialog(false);
   };
 
   const handleDeleteProject = async (projectPath) => {
-    // Update the directoryEntries state
-    console.log(folders);
-    console.log(projectPath);
-    setFolders((prevEntries) =>
-      prevEntries.filter((entry) => entry.path !== projectPath.path),
+    const updatedDirectories = config.directories.filter(
+      (entry) => entry.path !== projectPath.path,
     );
 
-    // Update the config state
     const updatedConfig = {
       ...config,
-      directories: config.directories.filter(
-        (dir) => dir.path !== projectPath.path,
-      ),
+      directories: updatedDirectories,
     };
 
     await writeTextFile("config.json", JSON.stringify(updatedConfig), {
@@ -254,11 +264,24 @@ export default function Home() {
     });
 
     setConfig(updatedConfig);
+    setDirectoryEntries(updatedDirectories);
+
+    if (selectedProject.path === projectPath.path) {
+      setSelectedProject("");
+    }
   };
 
-  // sort projects by name
-  const sortByName = (a, b) => {
-    return _.sortBy([a, b], ["name"]);
+  const handleSideBarClick = (project) => {
+    setSelectedProject(project);
+    setOpenDetails(false);
+  };
+
+  const writeAlmFile = async (path, data) => {
+    await writeTextFile(path, JSON.stringify(data, null, 2));
+    setAlmData((prevAlmData) => ({
+      ...prevAlmData,
+      [path]: data,
+    }));
   };
 
   if (displayProgress)
@@ -271,93 +294,104 @@ export default function Home() {
       />
     );
   return (
-    <>
-      <header
-        className={"w-full flex justify-between sticky top-0 bg-background"}
-      >
-        <NavigationMenu>
-          <Separator />
-          <Settings
-            projectDirectory={projectDirectory}
-            setProjectDirectory={setProjectDirectory}
-            setConfig={setConfig}
+    <DndProvider
+      backend={TouchBackend}
+      options={{
+        enableMouseEvents: true,
+      }}
+    >
+      <CustomDragLayer />
+      <SidebarProvider>
+        <div className="flex h-screen w-full">
+          <AppSidebar
+            projects={directoryEntries}
+            onClick={handleSideBarClick}
+            selectedProjectPath={selectedProject.path}
+            handleDelete={handleDeleteProject}
+            filterInput={filterInput}
             config={config}
+            setConfig={setConfig}
             handleAddingFolder={handleAddingFolder}
           />
-        </NavigationMenu>
-        <div className="flex justify-items-center items-center py-2 z-50">
-          <Input
-            onChange={(e) => setFilterInput(e.target.value)}
-            value={filterInput}
-            className="w-50 m-1"
-            type="search"
-            placeholder="Filter"
-          />
-          <Select
-            onChange={setFilterByTags}
-            value={filterByTags}
-            className="my-react-select-container rounded-none border-0 basic-multi-select m-1 min-w-[180px] w-200"
-            classNames={reactSelectClassNames}
-            classNamePrefix="my-react-select"
-            styles={colourStyles}
-            isMulti
-            placeholder={t("Filter by tag")}
-            options={config.tags ? Object.values(config.tags) : []}
-          />
-          <Select
-            onChange={setSortMethod}
-            value={sortMethod}
-            className="my-react-select-container rounded-none border-0 basic-multi-select m-1 min-w-[180px] w-200"
-            classNames={reactSelectClassNames}
-            classNamePrefix="my-react-select"
-            styles={colourStyles}
-            placeholder={t("Sort by")}
-            options={[
-              { value: "name", label: "Name" },
-              { value: "tags", label: "Tags" },
-            ]}
-          />
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger>
-                <Button
-                  variant="outline"
-                  onClick={() => setCollapseAll((prevState) => !prevState)}
-                >
-                  <EyeClosedIcon />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>{t("Collapse all")}</TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
-          <ThemeToggle />
+          <main className="flex-1 flex flex-col h-full">
+            {selectedProject ? (
+              <ProjectDetails
+                selectedProject={selectedProject}
+                open={open}
+                t={t}
+                config={config}
+                setConfig={setConfig}
+                setFilterByTags={setFilterByTags}
+                xmpKeywords={xmpKeywords}
+                setXmpKeywords={setXmpKeywords}
+                openDetails={openDetails}
+                setOpenDetails={setOpenDetails}
+                almData={almData}
+                writeAlmFile={writeAlmFile}
+              />
+            ) : (
+              <div className="flex-1 flex items-center justify-center">
+                <DropZone onFolderDrop={handleAddingFolder} />
+              </div>
+            )}
+          </main>
         </div>
-      </header>
-      <main>
-        {directoryEntries.length > 0 &&
-          directoryEntries
-            .filter((entry) =>
-              entry.name.toLowerCase().includes(filterInput.toLowerCase()),
-            )
-            .sort(sortMethod.value === "name" ? sortByName : sortByTags)
-            .map((entry) => {
-              return (
-                <ProjectItem
-                  key={entry.path}
-                  projectDirectory={projectDirectory}
-                  project={entry}
-                  config={config}
-                  setConfig={setConfig}
-                  setProjectDirectory={setProjectDirectory}
-                  filterByTags={filterByTags}
-                  setFilterByTags={setFilterByTags}
-                  collapseAll={collapseAll}
-                  onDelete={handleDeleteProject}
-                />
-              );
-            })}
-        <DropZone onFolderDrop={handleAddingFolder} />
-      </main>
-    </>
+      </SidebarProvider>
+      <Dialog open={showDialog} onOpenChange={setShowDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>
+              {t("Folder does not contain an Ableton project file")}
+            </DialogTitle>
+          </DialogHeader>
+          <DialogDescription>
+            <Alert variant="destructive">
+              <AlertDescription>
+                {t(
+                  "The folder you are trying to add does not contain any .als files. Are you sure you want to add it?",
+                )}
+              </AlertDescription>
+            </Alert>
+            <div className="flex justify-end mt-4">
+              <Button variant="outline" onClick={handleCancelAddFolder}>
+                {t("Cancel")}
+              </Button>
+              <Button
+                variant="primary"
+                onClick={handleConfirmAddFolder}
+                className="ml-2"
+              >
+                {t("Add Folder")}
+              </Button>
+            </div>
+          </DialogDescription>
+        </DialogContent>
+      </Dialog>
+      <Dialog
+        open={showAlreadyAddedDialog}
+        onOpenChange={setShowAlreadyAddedDialog}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{t("Folder already added")}</DialogTitle>
+          </DialogHeader>
+          <DialogDescription>
+            <Alert>
+              <AlertDescription>
+                {t("The folder you are trying to add is already in the list.")}
+              </AlertDescription>
+            </Alert>
+            <div className="flex justify-end mt-4">
+              <Button
+                variant="primary"
+                onClick={() => setShowAlreadyAddedDialog(false)}
+              >
+                {t("OK")}
+              </Button>
+            </div>
+          </DialogDescription>
+        </DialogContent>
+      </Dialog>
+    </DndProvider>
   );
 }
