@@ -1,0 +1,30 @@
+name: Update README with latest release
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  update-readme:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Get the latest release version
+      id: get_release
+      run: echo "::set-output name=tag::$(echo $GITHUB_REF | sed 's/refs\/tags\///')"
+      
+    - name: Update README
+      run: |
+        latest_version=${{ steps.get_release.outputs.tag }}
+        sed -i "s/releases\/download\/app-v[0-9.]*\/Ableton.Live.Manager_[0-9.]*_universal.dmg/releases\/download\/app-v${latest_version}\/Ableton.Live.Manager_${latest_version}_universal.dmg/g" README.md
+        sed -i "s/releases\/download\/app-v[0-9.]*\/Ableton.Live.Manager_[0-9.]*_x64_en-US.msi/releases\/download\/app-v${latest_version}\/Ableton.Live.Manager_${latest_version}_x64_en-US.msi/g" README.md
+
+    - name: Commit changes
+      run: |
+        git config --global user.name 'github-actions'
+        git config --global user.email 'github-actions@github.com'
+        git add README.md
+        git commit -m "Update README with latest release version ${latest_version}"
+        git push
