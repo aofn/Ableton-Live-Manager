@@ -193,34 +193,42 @@ export default function Home() {
     getConfig();
   }, []);
 
-  const handleAddingFolder = async (folderPath) => {
-    const folder = await readDir(folderPath, {
-      recursive: true,
-    });
+  const handleAddingFolder = async (folderPaths) => {
+    const foldersToAdd = Array.isArray(folderPaths)
+      ? folderPaths
+      : [folderPaths];
 
-    const folderObject = {
-      name: folderPath.split("/").pop(),
-      path: folderPath,
-      children: folder.map((entry) => ({
-        name: entry.name,
-        path: entry.path,
-      })),
-    };
+    for (const folderPath of foldersToAdd) {
+      const folder = await readDir(folderPath, {
+        recursive: true,
+      });
 
-    const containsAlsFile = folder.some((entry) => entry.path.endsWith(".als"));
+      const folderObject = {
+        name: folderPath.split("/").pop(),
+        path: folderPath,
+        children: folder.map((entry) => ({
+          name: entry.name,
+          path: entry.path,
+        })),
+      };
 
-    if (config.directories?.some((dir) => dir.path === folderPath)) {
-      setShowAlreadyAddedDialog(true);
-      return;
+      const containsAlsFile = folder.some((entry) =>
+        entry.path.endsWith(".als"),
+      );
+
+      if (config.directories?.some((dir) => dir.path === folderPath)) {
+        setShowAlreadyAddedDialog(true);
+        continue;
+      }
+
+      if (!containsAlsFile) {
+        setPendingFolder(folderObject);
+        setShowDialog(true);
+        continue;
+      }
+
+      addFolderToConfig(folderObject);
     }
-
-    if (!containsAlsFile) {
-      setPendingFolder(folderObject);
-      setShowDialog(true);
-      return;
-    }
-
-    addFolderToConfig(folderObject);
   };
 
   const addFolderToConfig = async (folderObject) => {

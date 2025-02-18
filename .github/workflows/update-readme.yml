@@ -3,6 +3,7 @@ name: Update README with latest release
 on:
   release:
     types: [published]
+  workflow_dispatch: # Allows manual triggering
 
 jobs:
   update-readme:
@@ -10,21 +11,38 @@ jobs:
     steps:
     - name: Checkout repository
       uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
 
-    - name: Get the latest release version
-      id: get_release
-      run: echo "::set-output name=tag::$(echo $GITHUB_REF | sed 's/refs\/tags\///')"
-      
+    - name: Set the latest release version
+      id: set_version
+      run: |
+        if [ "${{ github.event_name }}" = "release" ]; then
+          tag=$(echo $GITHUB_REF | sed 's/refs\/tags\///')
+          echo "tag=${tag#app-v}" >> $GITHUB_ENV
+        else
+          latest_tag=$(git describe --tags `git rev-list --tags --max-count=1`)
+          echo "tag=${latest_tag#app-v}" >> $GITHUB_ENV
+        fi
+
+    - name: Print README before update
+      run: cat README.md
+
     - name: Update README
       run: |
-        latest_version=${{ steps.get_release.outputs.tag }}
-        sed -i "s/releases\/download\/app-v[0-9.]*\/Ableton.Live.Manager_[0-9.]*_universal.dmg/releases\/download\/app-v${latest_version}\/Ableton.Live.Manager_${latest_version}_universal.dmg/g" README.md
-        sed -i "s/releases\/download\/app-v[0-9.]*\/Ableton.Live.Manager_[0-9.]*_x64_en-US.msi/releases\/download\/app-v${latest_version}\/Ableton.Live.Manager_${latest_version}_x64_en-US.msi/g" README.md
+        latest_version=${{ env.tag }}
+        sed -i "s#https://github.com/aofn/Ableton-Live-Manager/releases/download/app-v[0-9.]*/Ableton.Live.Manager_[0-9.]*_universal.dmg#https://github.com/aofn/Ableton-Live-Manager/releases/download/app-v${latest_version}/Ableton.Live.Manager_${latest_version}_universal.dmg#g" README.md
+        sed -i "s#https://github.com/aofn/Ableton-Live-Manager/releases/download/app-v[0-9.]*/Ableton.Live.Manager_[0-9.]*_x64_en-US.msi#https://github.com/aofn/Ableton-Live-Manager/releases/download/app-v${latest_version}/Ableton.Live.Manager_${latest_version}_x64_en-US.msi#g" README.md
+
+    - name: Print README after update
+      run: cat README.md
 
     - name: Commit changes
       run: |
         git config --global user.name 'github-actions'
         git config --global user.email 'github-actions@github.com'
+        git checkout main
+        git pull origin main
         git add README.md
         git commit -m "Update README with latest release version ${latest_version}"
-        git push
+        git push origin main
