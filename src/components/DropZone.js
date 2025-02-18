@@ -11,7 +11,7 @@ import { open } from "@tauri-apps/api/dialog";
 
 const DropZone = ({ onFolderDrop }) => {
   const [isDragging, setIsDragging] = useState(false);
-  const [draggedFolderName, setDraggedFolderName] = useState("");
+  const [draggedFolderNames, setDraggedFolderNames] = useState([]);
   const dragCounter = React.useRef(0);
 
   useEffect(() => {
@@ -19,14 +19,15 @@ const DropZone = ({ onFolderDrop }) => {
       console.log("Drop event triggered", event);
       const { payload } = event;
       if (payload && payload.length > 0) {
-        const folderPath = payload[0];
-        const folderName = folderPath.split("/").pop();
-        setDraggedFolderName(folderName);
-        console.log("Directory dropped:", folderPath);
+        const folderNames = payload.map((path) => path.split("/").pop());
+        setDraggedFolderNames(folderNames);
+        console.log("Directories dropped:", payload);
         try {
-          await onFolderDrop(folderPath);
+          for (const folderPath of payload) {
+            await onFolderDrop(folderPath);
+          }
         } catch (error) {
-          console.error("Error reading directory:", error);
+          console.error("Error reading directories:", error);
         }
       }
       // Reset drag state after drop
@@ -99,7 +100,7 @@ const DropZone = ({ onFolderDrop }) => {
         >
           <div className="text-center">
             <span className="block text-gray-500 text-lg">
-              {isDragging ? "Drop here" : "Drag and drop a folder here"}
+              {isDragging ? "Drop here" : "Drag and drop folders here"}
             </span>
             <span className="mt-2 block text-sm text-gray-400">
               or click to browse
@@ -111,8 +112,8 @@ const DropZone = ({ onFolderDrop }) => {
         <DialogOverlay />
         <DialogContent>
           <DialogTitle>
-            Drop the project to add <strong>{draggedFolderName}</strong> to the
-            app
+            Drop the projects to add{" "}
+            <strong>{draggedFolderNames.join(", ")}</strong> to the app
           </DialogTitle>
           <DialogDescription>
             Drop to add to Ableton Live Manager
