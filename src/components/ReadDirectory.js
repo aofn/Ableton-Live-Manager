@@ -13,12 +13,14 @@ export default function ReadDirectory({
   const readDirectory = async () => {
     const selected = await open({
       directory: true,
-      multiple: false,
+      multiple: true,
     });
 
-    if (selected !== null) {
-      setProjectDirectory(selected);
-      await handleAddingFolder(selected);
+    if (selected && selected.length > 0) {
+      for (const folder of selected) {
+        setProjectDirectory(folder);
+        await handleAddingFolder(folder);
+      }
     }
   };
 

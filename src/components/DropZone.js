@@ -72,11 +72,13 @@ const DropZone = ({ onFolderDrop }) => {
   const readDirectory = async () => {
     const selected = await open({
       directory: true,
-      multiple: false,
+      multiple: true, // Allow multiple selection
     });
 
-    if (selected !== null) {
-      await onFolderDrop(selected);
+    if (selected && selected.length > 0) {
+      for (const folder of selected) {
+        await onFolderDrop(folder);
+      }
     }
   };
 

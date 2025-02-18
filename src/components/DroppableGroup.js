@@ -15,13 +15,9 @@ const DroppableGroup = ({
           return;
         }
 
-        console.log("Drop event triggered");
-
         // Handle the actual project drop
         handleAddProjectToGroup(group.name, item.project);
         onDrop && onDrop();
-
-        // Reset the dropping state after the drop
 
         return { dropped: true };
       },
@@ -29,11 +25,13 @@ const DroppableGroup = ({
         isOver: !!monitor.isOver({ shallow: true }),
         canDrop: !!monitor.canDrop(),
       }),
+      hover: () => {
+        group.isDropping = true;
+      },
     }),
     [group, handleAddProjectToGroup, onDrop],
   );
 
-  // Clean up isDropping flag when component unmounts or drop ends
   useEffect(() => {
     return () => {
       group.isDropping = false;
@@ -43,40 +41,31 @@ const DroppableGroup = ({
   return (
     <div
       ref={drop}
+      className="w-full"
       style={{
         position: "relative",
         backgroundColor:
           isOver && canDrop ? "rgba(0, 0, 0, 0.1)" : "transparent",
         transition: "background-color 0.2s ease",
-        width: "100%",
-        height: "100%",
-        minHeight: group.projects.length === 0 ? "4rem" : "2rem",
       }}
-      onClick={(e) => e.stopPropagation()} // Prevent click events from bubbling up
+      onClick={(e) => e.stopPropagation()}
     >
-      <div style={{ position: "relative", zIndex: 1 }}>{children}</div>
-      <div
-        style={{
-          position: "absolute",
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          pointerEvents: "none",
-          border:
-            group.projects.length === 0
-              ? `2px dashed ${
-                  isOver && canDrop
-                    ? "rgba(0, 0, 0, 0.4)"
-                    : "rgba(0, 0, 0, 0.2)"
-                }`
-              : isOver && canDrop
-                ? "2px dashed rgba(0, 0, 0, 0.2)"
-                : "none",
-          borderRadius: "4px",
-          zIndex: 0,
-        }}
-      />
+      {children}
+      {isOver && canDrop && (
+        <div
+          style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            pointerEvents: "none",
+            border: "2px dashed rgba(0, 0, 0, 0.2)",
+            borderRadius: "4px",
+            zIndex: 0,
+          }}
+        />
+      )}
     </div>
   );
 };
