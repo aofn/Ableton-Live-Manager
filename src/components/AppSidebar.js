@@ -23,6 +23,8 @@ import DraggableProject from "@/components/DraggableProject";
 import CollapsibleGroup from "@/components/CollapsibleGroup";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import SidebarSearch from "@/components/SidebarSearch";
+import { useAlmFile } from "@/components/hooks/useAlmFile";
+import Ableton from "@/lib/Ableton";
 
 const AppSidebar = ({
   projects,
@@ -53,11 +55,16 @@ const AppSidebar = ({
     const tags = new Set();
 
     projects.forEach((project) => {
+      if (project.xmpKeywords) {
+        // Get just the objects from xmpKeywords
+        Object.entries(project.xmpKeywords).forEach(([key, keywordObj]) => {
+          tags.add(Object.values(keywordObj)[0]);
+        });
+      }
       if (project.alm?.tags) {
         Object.values(project.alm.tags).forEach((tag) => tags.add(tag));
       }
     });
-    console.log(Array.from(tags));
     setAllTags(Array.from(tags));
   }, [projects]);
 
@@ -76,18 +83,31 @@ const AppSidebar = ({
     // Filter by tags
     if (selectedTags.length > 0) {
       filtered = filtered.filter((project) => {
-        // Make sure project.alm and project.alm.tags exist
-        if (!project.alm?.tags) return false;
+        let hasMatchingTag = false;
 
-        // Get the project's tags array
-        const projectTags = Object.entries(project.alm.tags)
-          .filter(([_, isEnabled]) => isEnabled) // Only get enabled tags
-          .map(([tagName]) => tagName); // Get tag names
+        // Check ALM tags
+        if (project.alm?.tags) {
+          const almTags = Object.entries(project.alm.tags)
+            .filter(([_, isEnabled]) => isEnabled)
+            .map(([tagName]) => tagName);
 
-        // Check if any of the selected tags match the project's tags
-        return selectedTags.some((selectedTag) =>
-          projectTags.includes(selectedTag),
-        );
+          hasMatchingTag = selectedTags.some((selectedTag) =>
+            almTags.includes(selectedTag),
+          );
+        }
+
+        // Check XMP keywords
+        if (project.xmpKeywords && !hasMatchingTag) {
+          const xmpTags = Object.values(project.xmpKeywords).map(
+            (keywordObj) => Object.values(keywordObj)[0],
+          );
+
+          hasMatchingTag = selectedTags.some((selectedTag) =>
+            xmpTags.some((xmpTag) => xmpTag.value === selectedTag),
+          );
+        }
+
+        return hasMatchingTag;
       });
     }
 

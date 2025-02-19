@@ -30,6 +30,7 @@ import {
 } from "@/components/ui/dialog";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
+import Ableton from "@/lib/Ableton";
 
 /**
  * Displays a progress bar while scanning the project directory.
@@ -140,6 +141,16 @@ export default function Home() {
           copyOfFolders.splice(i, 1);
           continue;
         }
+
+        const fetchXmpKeywords = async () => {
+          const keywords = await Ableton.parseXmpFiles(entry.path);
+          // Add XMP keywords to allTags
+          if (keywords.length > 0) {
+            entry.xmpKeywords = keywords;
+          }
+        };
+
+        await fetchXmpKeywords();
 
         if (entry.children) {
           for (let [j, child] of entry.children.entries()) {
