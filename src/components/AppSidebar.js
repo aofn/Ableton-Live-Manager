@@ -1,6 +1,7 @@
 import {
   Sidebar,
   SidebarContent,
+  SidebarFooter,
   SidebarGroup,
   SidebarGroupLabel,
   SidebarHeader,
@@ -20,6 +21,10 @@ import { writeTextFile } from "@tauri-apps/api/fs";
 import { BaseDirectory } from "@tauri-apps/api/fs";
 import DraggableProject from "@/components/DraggableProject";
 import CollapsibleGroup from "@/components/CollapsibleGroup";
+import { ThemeToggle } from "@/components/ThemeToggle";
+import SidebarSearch from "@/components/SidebarSearch";
+import { useAlmFile } from "@/components/hooks/useAlmFile";
+import Ableton from "@/lib/Ableton";
 
 const AppSidebar = ({
   projects,
@@ -35,6 +40,8 @@ const AppSidebar = ({
   const [toggleCreateGroup, setToggleCreateGroup] = useState(false);
   const [isGroupsCollapsed, setIsGroupsCollapsed] = useState(false);
   const [isProjectsCollapsed, setIsProjectsCollapsed] = useState(false);
+  const [filteredProjects, setFilteredProjects] = useState(projects);
+  const [allTags, setAllTags] = useState([]);
   const { t } = useTranslation();
 
   useEffect(() => {
@@ -42,6 +49,70 @@ const AppSidebar = ({
       setGroups(config.groups);
     }
   }, [config.groups]);
+
+  // Extract all unique tags from projects
+  useEffect(() => {
+    const tags = new Set();
+
+    projects.forEach((project) => {
+      if (project.xmpKeywords) {
+        // Get just the objects from xmpKeywords
+        Object.entries(project.xmpKeywords).forEach(([key, keywordObj]) => {
+          tags.add(Object.values(keywordObj)[0]);
+        });
+      }
+      if (project.alm?.tags) {
+        Object.values(project.alm.tags).forEach((tag) => tags.add(tag));
+      }
+    });
+    setAllTags(Array.from(tags));
+  }, [projects]);
+
+  // Handle search and filter
+  const handleSearchAndFilter = (searchTerm, selectedTags) => {
+    let filtered = projects;
+
+    // Filter by search term
+    if (searchTerm) {
+      const searchLower = searchTerm.toLowerCase();
+      filtered = filtered.filter((project) =>
+        project.name.toLowerCase().includes(searchLower),
+      );
+    }
+
+    // Filter by tags
+    if (selectedTags.length > 0) {
+      filtered = filtered.filter((project) => {
+        let hasMatchingTag = false;
+
+        // Check ALM tags
+        if (project.alm?.tags) {
+          const almTags = Object.entries(project.alm.tags)
+            .filter(([_, isEnabled]) => isEnabled)
+            .map(([tagName]) => tagName);
+
+          hasMatchingTag = selectedTags.some((selectedTag) =>
+            almTags.includes(selectedTag),
+          );
+        }
+
+        // Check XMP keywords
+        if (project.xmpKeywords && !hasMatchingTag) {
+          const xmpTags = Object.values(project.xmpKeywords).map(
+            (keywordObj) => Object.values(keywordObj)[0],
+          );
+
+          hasMatchingTag = selectedTags.some((selectedTag) =>
+            xmpTags.some((xmpTag) => xmpTag.value === selectedTag),
+          );
+        }
+
+        return hasMatchingTag;
+      });
+    }
+
+    setFilteredProjects(filtered);
+  };
 
   const handleAddGroup = async () => {
     if (newGroupName.trim() !== "") {
@@ -186,6 +257,8 @@ const AppSidebar = ({
           </>
         )}
         <SidebarSeparator />
+
+        {/* Projects section */}
         <div
           className="flex items-center cursor-pointer"
           onClick={() => setIsProjectsCollapsed(!isProjectsCollapsed)}
@@ -198,10 +271,11 @@ const AppSidebar = ({
           />
           <SidebarGroupLabel>{t("Projects")}</SidebarGroupLabel>
         </div>
+
         {!isProjectsCollapsed && (
           <SidebarGroup>
             <SidebarMenu className="list-none">
-              {projects.map((project) => (
+              {filteredProjects.map((project) => (
                 <DraggableProject
                   key={project.path}
                   project={project}
@@ -214,6 +288,24 @@ const AppSidebar = ({
           </SidebarGroup>
         )}
       </SidebarContent>
+      <SidebarFooter>
+        <div className="flex items-center gap-2 p-4 border-t">
+          <div className="flex-1 min-w-0">
+            <SidebarSearch
+              onSearch={(searchTerm, selectedTags) =>
+                handleSearchAndFilter(searchTerm, selectedTags)
+              }
+              onFilterTags={(selectedTags) =>
+                handleSearchAndFilter("", selectedTags)
+              }
+              allTags={allTags}
+            />
+          </div>
+          <div className="flex-none">
+            <ThemeToggle />
+          </div>
+        </div>
+      </SidebarFooter>
     </Sidebar>
   );
 };
