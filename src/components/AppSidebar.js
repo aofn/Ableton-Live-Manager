@@ -22,6 +22,7 @@ import { BaseDirectory } from "@tauri-apps/api/fs";
 import DraggableProject from "@/components/DraggableProject";
 import CollapsibleGroup from "@/components/CollapsibleGroup";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import SidebarSearch from "@/components/SidebarSearch";
 
 const AppSidebar = ({
   projects,
@@ -37,6 +38,8 @@ const AppSidebar = ({
   const [toggleCreateGroup, setToggleCreateGroup] = useState(false);
   const [isGroupsCollapsed, setIsGroupsCollapsed] = useState(false);
   const [isProjectsCollapsed, setIsProjectsCollapsed] = useState(false);
+  const [filteredProjects, setFilteredProjects] = useState(projects);
+  const [allTags, setAllTags] = useState([]);
   const { t } = useTranslation();
 
   useEffect(() => {
@@ -44,6 +47,55 @@ const AppSidebar = ({
       setGroups(config.groups);
     }
   }, [config.groups]);
+
+  // Extract all unique tags from projects
+  useEffect(() => {
+    const tags = new Set();
+
+    projects.forEach((project) => {
+      if (project.alm?.tags) {
+        console.log("--------------");
+        console.log(project);
+        console.log("--------------");
+        Object.values(project.alm.tags).forEach((tag) => tags.add(tag));
+      }
+    });
+    console.log(Array.from(tags));
+    setAllTags(Array.from(tags));
+  }, [projects]);
+
+  // Handle search and filter
+  const handleSearchAndFilter = (searchTerm, selectedTags) => {
+    let filtered = projects;
+
+    // Filter by search term
+    if (searchTerm) {
+      const searchLower = searchTerm.toLowerCase();
+      filtered = filtered.filter((project) =>
+        project.name.toLowerCase().includes(searchLower),
+      );
+    }
+
+    // Filter by tags
+    if (selectedTags.length > 0) {
+      filtered = filtered.filter((project) => {
+        // Make sure project.alm and project.alm.tags exist
+        if (!project.alm?.tags) return false;
+
+        // Get the project's tags array
+        const projectTags = Object.entries(project.alm.tags)
+          .filter(([_, isEnabled]) => isEnabled) // Only get enabled tags
+          .map(([tagName]) => tagName); // Get tag names
+
+        // Check if any of the selected tags match the project's tags
+        return selectedTags.some((selectedTag) =>
+          projectTags.includes(selectedTag),
+        );
+      });
+    }
+
+    setFilteredProjects(filtered);
+  };
 
   const handleAddGroup = async () => {
     if (newGroupName.trim() !== "") {
@@ -188,6 +240,8 @@ const AppSidebar = ({
           </>
         )}
         <SidebarSeparator />
+
+        {/* Projects section */}
         <div
           className="flex items-center cursor-pointer"
           onClick={() => setIsProjectsCollapsed(!isProjectsCollapsed)}
@@ -200,10 +254,11 @@ const AppSidebar = ({
           />
           <SidebarGroupLabel>{t("Projects")}</SidebarGroupLabel>
         </div>
+
         {!isProjectsCollapsed && (
           <SidebarGroup>
             <SidebarMenu className="list-none">
-              {projects.map((project) => (
+              {filteredProjects.map((project) => (
                 <DraggableProject
                   key={project.path}
                   project={project}
@@ -217,8 +272,21 @@ const AppSidebar = ({
         )}
       </SidebarContent>
       <SidebarFooter>
-        <div className="flex items-center px-4 py-2">
-          <ThemeToggle />
+        <div className="flex items-center gap-2 p-4 border-t">
+          <div className="flex-1 min-w-0">
+            <SidebarSearch
+              onSearch={(searchTerm, selectedTags) =>
+                handleSearchAndFilter(searchTerm, selectedTags)
+              }
+              onFilterTags={(selectedTags) =>
+                handleSearchAndFilter("", selectedTags)
+              }
+              allTags={allTags}
+            />
+          </div>
+          <div className="flex-none">
+            <ThemeToggle />
+          </div>
         </div>
       </SidebarFooter>
     </Sidebar>
