@@ -59,7 +59,6 @@ class Ableton {
             },
           };
         });
-        console.log(keywords);
         allKeywords.push(...keywords);
       });
     }
