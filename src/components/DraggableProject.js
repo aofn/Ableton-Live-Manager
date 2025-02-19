@@ -78,6 +78,7 @@ const DraggableProject = ({
             <ContextMenuTrigger>
               <SidebarMenuItem>
                 <SidebarMenuButton
+                  className="text-xs"
                   onClick={(e) => {
                     e.stopPropagation();
                     onClick(project);
