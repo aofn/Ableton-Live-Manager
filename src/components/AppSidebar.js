@@ -54,9 +54,6 @@ const AppSidebar = ({
 
     projects.forEach((project) => {
       if (project.alm?.tags) {
-        console.log("--------------");
-        console.log(project);
-        console.log("--------------");
         Object.values(project.alm.tags).forEach((tag) => tags.add(tag));
       }
     });
