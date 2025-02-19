@@ -137,6 +137,7 @@ const CollapsibleGroup = (props) => {
             <ContextMenu key={project.path}>
               <ContextMenuTrigger>
                 <SidebarMenuButton
+                  className="text-xs"
                   onClick={() => props.onClick(project)}
                   isActive={props.selectedProjectPath === project.path}
                 >
