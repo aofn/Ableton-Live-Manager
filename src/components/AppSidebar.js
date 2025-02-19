@@ -1,6 +1,7 @@
 import {
   Sidebar,
   SidebarContent,
+  SidebarFooter,
   SidebarGroup,
   SidebarGroupLabel,
   SidebarHeader,
@@ -20,6 +21,7 @@ import { writeTextFile } from "@tauri-apps/api/fs";
 import { BaseDirectory } from "@tauri-apps/api/fs";
 import DraggableProject from "@/components/DraggableProject";
 import CollapsibleGroup from "@/components/CollapsibleGroup";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 const AppSidebar = ({
   projects,
@@ -214,6 +216,11 @@ const AppSidebar = ({
           </SidebarGroup>
         )}
       </SidebarContent>
+      <SidebarFooter>
+        <div className="flex items-center px-4 py-2">
+          <ThemeToggle />
+        </div>
+      </SidebarFooter>
     </Sidebar>
   );
 };
