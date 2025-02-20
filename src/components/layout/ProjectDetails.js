@@ -19,13 +19,12 @@ const ProjectDetails = ({
   t,
   config,
   setConfig,
-  setFilterByTags,
   xmpKeywords,
   setXmpKeywords,
   openDetails,
   setOpenDetails,
 }) => {
-  const { almData, isLoading } = useAlmFile(selectedProject.path);
+  const { almData } = useAlmFile(selectedProject.path);
 
   const handleOpenProject = async (path) => {
     if (path.endsWith(".als")) setOpenDetails(path);
@@ -66,7 +65,6 @@ const ProjectDetails = ({
           projectDirectory={selectedProject.path}
           config={config}
           setConfig={setConfig}
-          setFilterByTags={setFilterByTags}
           xmpKeywords={xmpKeywords}
           setXmpKeywords={setXmpKeywords}
         />

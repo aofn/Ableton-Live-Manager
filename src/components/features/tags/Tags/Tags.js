@@ -47,9 +47,6 @@ export const Tags = ({
                 key={tag.value}
                 variant={tag.variant}
                 className="px-1 focus-visible:outline-none"
-                onClick={() =>
-                  setFilterByTags((prevState) => [...prevState, tag])
-                }
               >
                 {tag.label}
               </Badge>
