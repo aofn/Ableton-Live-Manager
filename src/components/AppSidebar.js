@@ -23,8 +23,6 @@ import DraggableProject from "@/components/DraggableProject";
 import CollapsibleGroup from "@/components/CollapsibleGroup";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import SidebarSearch from "@/components/SidebarSearch";
-import { useAlmFile } from "@/components/hooks/useAlmFile";
-import Ableton from "@/lib/Ableton";
 
 const AppSidebar = ({
   projects,
@@ -52,20 +50,27 @@ const AppSidebar = ({
 
   // Extract all unique tags from projects
   useEffect(() => {
-    const tags = new Set();
+    // Create a Map to store unique tags by their value
+    const tagMap = new Map();
 
     projects.forEach((project) => {
       if (project.xmpKeywords) {
-        // Get just the objects from xmpKeywords
-        Object.entries(project.xmpKeywords).forEach(([key, keywordObj]) => {
-          tags.add(Object.values(keywordObj)[0]);
+        Object.entries(project.xmpKeywords).forEach(([_, keywordObj]) => {
+          const tag = Object.values(keywordObj)[0];
+          // Use the tag's value as the key to ensure uniqueness
+          tagMap.set(tag.value, tag);
         });
       }
       if (project.alm?.tags) {
-        Object.values(project.alm.tags).forEach((tag) => tags.add(tag));
+        Object.values(project.alm.tags).forEach((tag) => {
+          // Use the tag's value as the key to ensure uniqueness
+          tagMap.set(tag.value, tag);
+        });
       }
     });
-    setAllTags(Array.from(tags));
+
+    // Convert the Map values back to an array
+    setAllTags(Array.from(tagMap.values()));
   }, [projects]);
 
   // Handle search and filter
