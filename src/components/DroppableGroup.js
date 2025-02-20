@@ -1,5 +1,6 @@
 import { useDrop } from "react-dnd";
-import { useEffect } from "react";
+import { useEffect, useCallback } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 
 const DroppableGroup = ({
   group,
@@ -7,6 +8,12 @@ const DroppableGroup = ({
   onDrop,
   children,
 }) => {
+  const resetDropState = useCallback(() => {
+    if (group.isDropping) {
+      group.isDropping = false;
+    }
+  }, [group]);
+
   const [{ isOver, canDrop }, drop] = useDrop(
     () => ({
       accept: "PROJECT",
@@ -14,59 +21,94 @@ const DroppableGroup = ({
         if (monitor.didDrop()) {
           return;
         }
-
-        // Handle the actual project drop
         handleAddProjectToGroup(group.name, item.project);
         onDrop && onDrop();
-
+        resetDropState();
         return { dropped: true };
       },
       collect: (monitor) => ({
         isOver: !!monitor.isOver({ shallow: true }),
         canDrop: !!monitor.canDrop(),
       }),
-      hover: () => {
-        group.isDropping = true;
+      hover: (item, monitor) => {
+        if (monitor.isOver({ shallow: true })) {
+          group.isDropping = true;
+        }
+      },
+      canDrop: (item, monitor) => {
+        if (!monitor.isOver({ shallow: true })) {
+          resetDropState();
+        }
+        return true;
       },
     }),
-    [group, handleAddProjectToGroup, onDrop],
+    [group, handleAddProjectToGroup, onDrop, resetDropState],
   );
 
   useEffect(() => {
     return () => {
-      group.isDropping = false;
+      resetDropState();
     };
-  }, [group]);
+  }, [resetDropState]);
+
+  useEffect(() => {
+    if (!isOver) {
+      resetDropState();
+    }
+  }, [isOver, resetDropState]);
 
   return (
-    <div
+    <motion.div
       ref={drop}
-      className="w-full"
-      style={{
-        position: "relative",
+      className={`w-full relative ${
+        isOver && canDrop ? "bg-black bg-opacity-10" : "bg-transparent"
+      }`}
+      animate={{
         backgroundColor:
           isOver && canDrop ? "rgba(0, 0, 0, 0.1)" : "transparent",
-        transition: "background-color 0.2s ease",
       }}
+      transition={{ duration: 0.2 }}
       onClick={(e) => e.stopPropagation()}
     >
       {children}
-      {isOver && canDrop && (
-        <div
-          style={{
-            position: "absolute",
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            pointerEvents: "none",
-            border: "2px dashed rgba(0, 0, 0, 0.2)",
-            borderRadius: "4px",
-            zIndex: 0,
-          }}
-        />
-      )}
-    </div>
+      <AnimatePresence>
+        {isOver && canDrop && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="absolute inset-0 pointer-events-none z-0"
+          >
+            <svg className="w-full h-full">
+              <motion.rect
+                x="0"
+                y="0"
+                width="100%"
+                height="100%"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="4"
+                strokeDasharray="8 8"
+                rx="4"
+                initial={{
+                  strokeDashoffset: 0,
+                }}
+                animate={{
+                  strokeDashoffset: [-20, 0],
+                }}
+                transition={{
+                  repeat: Infinity,
+                  repeatType: "reverse",
+                  duration: 4,
+                  ease: "linear",
+                }}
+                className="text-foreground opacity-50"
+              />
+            </svg>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </motion.div>
   );
 };
 
