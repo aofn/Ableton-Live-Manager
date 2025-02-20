@@ -10,13 +10,11 @@ import {
 import { Progress } from "@/components/ui/progress";
 import { invoke } from "@tauri-apps/api/tauri";
 import { useTranslation } from "react-i18next";
-import { cn } from "@/lib/utils";
-import { badgeVariants } from "@/components/ui/badge";
 import "remixicon/fonts/remixicon.css";
 import { SidebarProvider } from "@/components/ui/sidebar";
-import Index from "@/components/layout/AppSidebar";
+import AppSidebar from "@/components/layout/AppSidebar";
 import { open } from "@tauri-apps/api/shell";
-import ProjectDetails from "@/components/ProjectDetails";
+import ProjectDetails from "@/components/layout/ProjectDetails";
 import { TouchBackend } from "react-dnd-touch-backend";
 import { DndProvider } from "react-dnd";
 import CustomDragLayer from "@/components/CustomDragLayer";
@@ -40,11 +38,9 @@ import Ableton from "@/lib/Ableton";
  * @param value - The progress value.
  * @returns {JSX.Element} - The JSX element representing the progress bar.
  *
- * @TODO navigate through nested projects
  * @TODO use https://github.com/tauri-apps/plugins-workspace/tree/v1/plugins/fs-watch to listen for changes in root directory
  * @TODO define scope properly
  * @TODO open projects in separate tabs
- * @TODO fix dark mode
  * @TODO create single component for dialogs scattered across the app
  */
 
@@ -61,14 +57,12 @@ function ProgressBar({ currentScanPath, currentScan, totalScan, value }) {
 }
 export default function Home() {
   const [directoryEntries, setDirectoryEntries] = useState([]);
-  const [filterInput, setFilterInput] = useState("");
   const [currentScan, setCurrentScan] = useState(0);
   const [totalScan, setTotalScan] = useState(0);
   const [progressTotal, setProgressTotal] = useState(10);
   const [currentScanPath, setCurrentScanPath] = useState("");
   const [displayProgress, setDisplayProgress] = useState(false);
   const [config, setConfig] = useState({});
-  const [filterByTags, setFilterByTags] = useState([]);
   const [folders, setFolders] = useState([]);
   const [selectedProject, setSelectedProject] = useState("");
   const [xmpKeywords, setXmpKeywords] = useState([]);
@@ -79,37 +73,6 @@ export default function Home() {
   const [pendingFolder, setPendingFolder] = useState(null);
 
   const { t } = useTranslation();
-  const colourStyles = {
-    option: (styles) => ({
-      ...styles,
-      backgroundColor: "black",
-      color: "blue",
-    }),
-    control: (styles) => ({
-      ...styles,
-      borderRadius: "0px",
-      borderWidth: "1px !important",
-    }),
-    multiValueLabel: (styles, { data }) => ({
-      ...styles,
-      color:
-        data.variant === "default" || data.variant === "destructive"
-          ? "white"
-          : "black",
-    }),
-  };
-
-  const reactSelectClassNames = {
-    multiValueLabel: (state) => {
-      return cn(
-        badgeVariants({ variant: state.data.variant }),
-        "text-background !important",
-      );
-    },
-    multiValueRemove: (state) => {
-      return cn(badgeVariants({ variant: state.data.variant }));
-    },
-  };
 
   useEffect(() => {
     setFolders(config?.directories);
@@ -322,12 +285,11 @@ export default function Home() {
       <CustomDragLayer />
       <SidebarProvider>
         <div className="flex h-screen w-full">
-          <Index
+          <AppSidebar
             projects={directoryEntries}
             onClick={handleSideBarClick}
             selectedProjectPath={selectedProject.path}
             handleDelete={handleDeleteProject}
-            filterInput={filterInput}
             config={config}
             setConfig={setConfig}
             handleAddingFolder={handleAddingFolder}
@@ -340,7 +302,6 @@ export default function Home() {
                 t={t}
                 config={config}
                 setConfig={setConfig}
-                setFilterByTags={setFilterByTags}
                 xmpKeywords={xmpKeywords}
                 setXmpKeywords={setXmpKeywords}
                 openDetails={openDetails}
