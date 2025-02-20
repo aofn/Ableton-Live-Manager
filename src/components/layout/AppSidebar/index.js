@@ -19,10 +19,10 @@ import { cn } from "@/lib/utils";
 import Settings from "@/components/Settings";
 import { writeTextFile } from "@tauri-apps/api/fs";
 import { BaseDirectory } from "@tauri-apps/api/fs";
-import DraggableProject from "@/components/DraggableProject";
-import CollapsibleGroup from "@/components/CollapsibleGroup";
-import { ThemeToggle } from "@/components/ThemeToggle";
-import SidebarSearch from "@/components/SidebarSearch";
+import Index from "@/components/features/projects/DraggableProject";
+import CollapsibleGroup from "@/components/layout/AppSidebar/CollapsibleGroup";
+import { ThemeToggle } from "@/components/layout/ThemeToggle";
+import SidebarSearch from "@/components/layout/AppSidebar/SidebarSearch";
 
 const AppSidebar = ({
   projects,
@@ -281,7 +281,7 @@ const AppSidebar = ({
           <SidebarGroup>
             <SidebarMenu className="list-none">
               {filteredProjects.map((project) => (
-                <DraggableProject
+                <Index
                   key={project.path}
                   project={project}
                   onDelete={handleDelete}

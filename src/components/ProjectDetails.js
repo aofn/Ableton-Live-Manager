@@ -9,9 +9,9 @@ import {
 } from "@/components/ui/tooltip";
 import { OpenInNewWindowIcon } from "@radix-ui/react-icons";
 import { Separator } from "@/components/ui/separator";
-import { Tags } from "@/components/Tags";
+import { Tags } from "@/components/features/tags/Tags/Tags";
 import FolderView from "@/components/FolderView";
-import { RightColumn } from "@/components/RightColumn";
+import { RightColumn } from "@/components/layout/RightColumn";
 
 const ProjectDetails = ({
   selectedProject,

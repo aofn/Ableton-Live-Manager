@@ -10,7 +10,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import AddTagDialogue from "@/components/AddTagDialogue";
+import AddTagDialogue from "@/components/features/tags/AddTagDialogue";
 import { Cross2Icon, PlusIcon } from "@radix-ui/react-icons";
 import { cn } from "@/lib/utils";
 import Ableton from "@/lib/Ableton";

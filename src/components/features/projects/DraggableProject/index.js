@@ -18,12 +18,7 @@ import {
 import { Button } from "@/components/ui/button";
 import ConfirmationDialog from "@/components/ConfirmationDialog";
 
-const DraggableProject = ({
-  project,
-  onClick,
-  selectedProjectPath,
-  onDelete,
-}) => {
+const Index = ({ project, onClick, selectedProjectPath, onDelete }) => {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [showContextMenu, setShowContextMenu] = useState(true);
 
@@ -131,4 +126,4 @@ const DraggableProject = ({
   );
 };
 
-export default DraggableProject;
+export default Index;

@@ -8,8 +8,8 @@ import { useTranslation } from "react-i18next";
 
 import { Separator } from "@/components/ui/separator";
 import FolderView from "@/components/FolderView";
-import { Tags } from "@/components/Tags";
-import { RightColumn } from "@/components/RightColumn";
+import { Tags } from "@/components/features/tags/Tags/Tags";
+import { RightColumn } from "@/components/layout/RightColumn";
 import {
   Tooltip,
   TooltipContent,

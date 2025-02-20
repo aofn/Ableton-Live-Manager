@@ -14,7 +14,7 @@ import { cn } from "@/lib/utils";
 import { badgeVariants } from "@/components/ui/badge";
 import "remixicon/fonts/remixicon.css";
 import { SidebarProvider } from "@/components/ui/sidebar";
-import AppSidebar from "@/components/AppSidebar";
+import Index from "@/components/layout/AppSidebar";
 import { open } from "@tauri-apps/api/shell";
 import ProjectDetails from "@/components/ProjectDetails";
 import { TouchBackend } from "react-dnd-touch-backend";
@@ -322,7 +322,7 @@ export default function Home() {
       <CustomDragLayer />
       <SidebarProvider>
         <div className="flex h-screen w-full">
-          <AppSidebar
+          <Index
             projects={directoryEntries}
             onClick={handleSideBarClick}
             selectedProjectPath={selectedProject.path}

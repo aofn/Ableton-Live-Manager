@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/sidebar";
 import { ChevronDownIcon } from "@radix-ui/react-icons";
 import { cn } from "@/lib/utils";
-import DroppableGroup from "@/components/DroppableGroup";
+import DroppableGroup from "@/components/layout/AppSidebar/DroppableGroup";
 import {
   DropdownMenu,
   DropdownMenuContent,
