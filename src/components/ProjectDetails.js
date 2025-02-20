@@ -33,7 +33,7 @@ const ProjectDetails = ({
   };
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full px-2">
       <header className="sticky top-0 z-50 w-full bg-background border-b">
         <div className="flex flex-col gap-1 py-4 px-4">
           <h1 className="text-xl font-semibold tracking-tight">
@@ -72,7 +72,7 @@ const ProjectDetails = ({
         />
       </section>
 
-      <Separator />
+      <Separator className="my-2" />
 
       <section className="flex-1 pb-6">
         <div className="grid grid-cols-2 h-full">
@@ -82,7 +82,7 @@ const ProjectDetails = ({
             handleOpenProject={handleOpenProject}
           />
           <div className="flex">
-            <Separator orientation="vertical" className="" />
+            <Separator orientation="vertical" className="py-2" />
             <RightColumn
               openDetails={openDetails}
               name={selectedProject.name}
