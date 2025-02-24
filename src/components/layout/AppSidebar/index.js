@@ -19,13 +19,10 @@ import { cn } from "@/lib/utils";
 import Settings from "@/components/Settings";
 import { writeTextFile } from "@tauri-apps/api/fs";
 import { BaseDirectory } from "@tauri-apps/api/fs";
-import DraggableProject from "@/components/DraggableProject";
-import CollapsibleGroup from "@/components/CollapsibleGroup";
-import { ThemeToggle } from "@/components/ThemeToggle";
-import SidebarSearch from "@/components/SidebarSearch";
-import { useAlmFile } from "@/components/hooks/useAlmFile";
-import Ableton from "@/lib/Ableton";
-
+import Index from "@/components/features/projects/DraggableProject";
+import CollapsibleGroup from "@/components/layout/AppSidebar/CollapsibleGroup";
+import { ThemeToggle } from "@/components/layout/ThemeToggle";
+import SidebarSearch from "@/components/layout/AppSidebar/SidebarSearch";
 const AppSidebar = ({
   projects,
   onClick,
@@ -42,6 +39,7 @@ const AppSidebar = ({
   const [isProjectsCollapsed, setIsProjectsCollapsed] = useState(false);
   const [filteredProjects, setFilteredProjects] = useState(projects);
   const [allTags, setAllTags] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
   const { t } = useTranslation();
 
   useEffect(() => {
@@ -50,29 +48,30 @@ const AppSidebar = ({
     }
   }, [config.groups]);
 
-  // Extract all unique tags from projects
   useEffect(() => {
-    const tags = new Set();
+    const tagMap = new Map();
 
     projects.forEach((project) => {
       if (project.xmpKeywords) {
-        // Get just the objects from xmpKeywords
-        Object.entries(project.xmpKeywords).forEach(([key, keywordObj]) => {
-          tags.add(Object.values(keywordObj)[0]);
+        Object.entries(project.xmpKeywords).forEach(([_, keywordObj]) => {
+          const tag = Object.values(keywordObj)[0];
+          tagMap.set(tag.value, tag);
         });
       }
       if (project.alm?.tags) {
-        Object.values(project.alm.tags).forEach((tag) => tags.add(tag));
+        Object.values(project.alm.tags).forEach((tag) => {
+          tagMap.set(tag.value, tag);
+        });
       }
     });
-    setAllTags(Array.from(tags));
+
+    setAllTags(Array.from(tagMap.values()));
   }, [projects]);
 
-  // Handle search and filter
   const handleSearchAndFilter = (searchTerm, selectedTags) => {
+    setSearchTerm(searchTerm);
     let filtered = projects;
 
-    // Filter by search term
     if (searchTerm) {
       const searchLower = searchTerm.toLowerCase();
       filtered = filtered.filter((project) =>
@@ -80,12 +79,10 @@ const AppSidebar = ({
       );
     }
 
-    // Filter by tags
     if (selectedTags.length > 0) {
       filtered = filtered.filter((project) => {
         let hasMatchingTag = false;
 
-        // Check ALM tags
         if (project.alm?.tags) {
           const almTags = Object.entries(project.alm.tags)
             .filter(([_, isEnabled]) => isEnabled)
@@ -96,7 +93,6 @@ const AppSidebar = ({
           );
         }
 
-        // Check XMP keywords
         if (project.xmpKeywords && !hasMatchingTag) {
           const xmpTags = Object.values(project.xmpKeywords).map(
             (keywordObj) => Object.values(keywordObj)[0],
@@ -218,6 +214,7 @@ const AppSidebar = ({
                       selectedProjectPath={selectedProjectPath}
                       config={config}
                       setConfig={setConfig}
+                      searchTerm={searchTerm}
                       updateConfigFile={updateConfigFile}
                     />
                   ))}
@@ -258,7 +255,6 @@ const AppSidebar = ({
         )}
         <SidebarSeparator />
 
-        {/* Projects section */}
         <div
           className="flex items-center cursor-pointer"
           onClick={() => setIsProjectsCollapsed(!isProjectsCollapsed)}
@@ -276,7 +272,7 @@ const AppSidebar = ({
           <SidebarGroup>
             <SidebarMenu className="list-none">
               {filteredProjects.map((project) => (
-                <DraggableProject
+                <Index
                   key={project.path}
                   project={project}
                   onDelete={handleDelete}

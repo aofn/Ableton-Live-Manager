@@ -1,5 +1,5 @@
 import { useDragLayer } from "react-dnd";
-import DragPreview from "./DragPreview";
+import Index from "./features/projects/DragPreview";
 
 const CustomDragLayer = () => {
   const { isDragging, item, currentOffset } = useDragLayer((monitor) => ({
@@ -23,7 +23,7 @@ const CustomDragLayer = () => {
         transform: "translate(-50%, -50%)",
       }}
     >
-      <DragPreview name={item.project.name} />
+      <Index name={item.project.name} />
     </div>
   );
 };

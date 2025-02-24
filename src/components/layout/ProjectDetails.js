@@ -9,9 +9,9 @@ import {
 } from "@/components/ui/tooltip";
 import { OpenInNewWindowIcon } from "@radix-ui/react-icons";
 import { Separator } from "@/components/ui/separator";
-import { Tags } from "@/components/Tags";
+import { Tags } from "@/components/features/tags/Tags/Tags";
 import FolderView from "@/components/FolderView";
-import { RightColumn } from "@/components/RightColumn";
+import { RightColumn } from "@/components/layout/RightColumn";
 
 const ProjectDetails = ({
   selectedProject,
@@ -19,13 +19,12 @@ const ProjectDetails = ({
   t,
   config,
   setConfig,
-  setFilterByTags,
   xmpKeywords,
   setXmpKeywords,
   openDetails,
   setOpenDetails,
 }) => {
-  const { almData, isLoading } = useAlmFile(selectedProject.path);
+  const { almData } = useAlmFile(selectedProject.path);
 
   const handleOpenProject = async (path) => {
     if (path.endsWith(".als")) setOpenDetails(path);
@@ -33,7 +32,7 @@ const ProjectDetails = ({
   };
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full px-2">
       <header className="sticky top-0 z-50 w-full bg-background border-b">
         <div className="flex flex-col gap-1 py-4 px-4">
           <h1 className="text-xl font-semibold tracking-tight">
@@ -66,13 +65,12 @@ const ProjectDetails = ({
           projectDirectory={selectedProject.path}
           config={config}
           setConfig={setConfig}
-          setFilterByTags={setFilterByTags}
           xmpKeywords={xmpKeywords}
           setXmpKeywords={setXmpKeywords}
         />
       </section>
 
-      <Separator />
+      <Separator className="my-2" />
 
       <section className="flex-1 pb-6">
         <div className="grid grid-cols-2 h-full">
@@ -82,7 +80,7 @@ const ProjectDetails = ({
             handleOpenProject={handleOpenProject}
           />
           <div className="flex">
-            <Separator orientation="vertical" className="" />
+            <Separator orientation="vertical" className="py-2" />
             <RightColumn
               openDetails={openDetails}
               name={selectedProject.name}
