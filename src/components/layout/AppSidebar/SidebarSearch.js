@@ -1,5 +1,5 @@
 import * as React from "react";
-import { useState, useRef, useLayoutEffect } from "react";
+import { useState, useRef, useLayoutEffect, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import {
   Popover,
@@ -16,6 +16,7 @@ const SidebarSearch = ({ onSearch, onFilterTags, allTags = [] }) => {
   const [selectedTags, setSelectedTags] = useState([]);
   const [contentHeight, setContentHeight] = useState(0);
   const tagsRef = useRef(null);
+  const searchInputRef = useRef(null);
 
   // Measure content height
   useLayoutEffect(() => {
@@ -40,6 +41,20 @@ const SidebarSearch = ({ onSearch, onFilterTags, allTags = [] }) => {
     onSearch(searchTerm, newSelectedTags);
   };
 
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      if ((event.ctrlKey || event.metaKey) && event.key === "f") {
+        event.preventDefault();
+        searchInputRef.current.focus();
+      }
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, []);
+
   return (
     <div className="flex items-center gap-2 w-full min-w-0">
       <Input
@@ -48,6 +63,7 @@ const SidebarSearch = ({ onSearch, onFilterTags, allTags = [] }) => {
         value={searchTerm}
         onChange={(e) => handleSearch(e.target.value)}
         className="h-8 text-sm min-w-0"
+        ref={searchInputRef}
       />
       <Popover>
         <PopoverTrigger asChild>
