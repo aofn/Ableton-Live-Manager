@@ -23,7 +23,6 @@ import Index from "@/components/features/projects/DraggableProject";
 import CollapsibleGroup from "@/components/layout/AppSidebar/CollapsibleGroup";
 import { ThemeToggle } from "@/components/layout/ThemeToggle";
 import SidebarSearch from "@/components/layout/AppSidebar/SidebarSearch";
-
 const AppSidebar = ({
   projects,
   onClick,
@@ -40,6 +39,7 @@ const AppSidebar = ({
   const [isProjectsCollapsed, setIsProjectsCollapsed] = useState(false);
   const [filteredProjects, setFilteredProjects] = useState(projects);
   const [allTags, setAllTags] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
   const { t } = useTranslation();
 
   useEffect(() => {
@@ -48,36 +48,30 @@ const AppSidebar = ({
     }
   }, [config.groups]);
 
-  // Extract all unique tags from projects
   useEffect(() => {
-    // Create a Map to store unique tags by their value
     const tagMap = new Map();
 
     projects.forEach((project) => {
       if (project.xmpKeywords) {
         Object.entries(project.xmpKeywords).forEach(([_, keywordObj]) => {
           const tag = Object.values(keywordObj)[0];
-          // Use the tag's value as the key to ensure uniqueness
           tagMap.set(tag.value, tag);
         });
       }
       if (project.alm?.tags) {
         Object.values(project.alm.tags).forEach((tag) => {
-          // Use the tag's value as the key to ensure uniqueness
           tagMap.set(tag.value, tag);
         });
       }
     });
 
-    // Convert the Map values back to an array
     setAllTags(Array.from(tagMap.values()));
   }, [projects]);
 
-  // Handle search and filter
   const handleSearchAndFilter = (searchTerm, selectedTags) => {
+    setSearchTerm(searchTerm);
     let filtered = projects;
 
-    // Filter by search term
     if (searchTerm) {
       const searchLower = searchTerm.toLowerCase();
       filtered = filtered.filter((project) =>
@@ -85,12 +79,10 @@ const AppSidebar = ({
       );
     }
 
-    // Filter by tags
     if (selectedTags.length > 0) {
       filtered = filtered.filter((project) => {
         let hasMatchingTag = false;
 
-        // Check ALM tags
         if (project.alm?.tags) {
           const almTags = Object.entries(project.alm.tags)
             .filter(([_, isEnabled]) => isEnabled)
@@ -101,7 +93,6 @@ const AppSidebar = ({
           );
         }
 
-        // Check XMP keywords
         if (project.xmpKeywords && !hasMatchingTag) {
           const xmpTags = Object.values(project.xmpKeywords).map(
             (keywordObj) => Object.values(keywordObj)[0],
@@ -223,6 +214,7 @@ const AppSidebar = ({
                       selectedProjectPath={selectedProjectPath}
                       config={config}
                       setConfig={setConfig}
+                      searchTerm={searchTerm}
                       updateConfigFile={updateConfigFile}
                     />
                   ))}
@@ -263,7 +255,6 @@ const AppSidebar = ({
         )}
         <SidebarSeparator />
 
-        {/* Projects section */}
         <div
           className="flex items-center cursor-pointer"
           onClick={() => setIsProjectsCollapsed(!isProjectsCollapsed)}

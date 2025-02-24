@@ -29,7 +29,6 @@ import {
 } from "@/components/ui/context-menu";
 import { MoreHorizontal } from "lucide-react";
 import ConfirmationDialog from "@/components/ConfirmationDialog";
-
 const CollapsibleGroup = (props) => {
   const [isOpen, setIsOpen] = useState(false);
   const [isRenaming, setIsRenaming] = useState(false);
@@ -129,38 +128,44 @@ const CollapsibleGroup = (props) => {
     setIsDeleteDialogOpen(false);
   };
 
-  const renderGroupContent = () => (
-    <div onClick={(e) => e.stopPropagation()}>
-      {props.group.projects.length > 0 ? (
-        <SidebarMenuSub className="list-none">
-          {props.group.projects.map((project) => (
-            <ContextMenu key={project.path}>
-              <ContextMenuTrigger>
-                <SidebarMenuButton
-                  className="text-xs"
-                  onClick={() => props.onClick(project)}
-                  isActive={props.selectedProjectPath === project.path}
-                >
-                  {project.name}
-                </SidebarMenuButton>
-              </ContextMenuTrigger>
-              <ContextMenuContent>
-                <ContextMenuItem
-                  onClick={() => handleRemoveFromGroup(project.path)}
-                >
-                  Remove from group
-                </ContextMenuItem>
-              </ContextMenuContent>
-            </ContextMenu>
-          ))}
-        </SidebarMenuSub>
-      ) : (
-        <div className="px-4 py-2 text-sm text-muted-foreground">
-          Drop projects here
-        </div>
-      )}
-    </div>
-  );
+  const renderGroupContent = () => {
+    const filteredProjects = props.group.projects.filter((project) =>
+      project.name.toLowerCase().includes(props.searchTerm.toLowerCase()),
+    );
+
+    return (
+      <div onClick={(e) => e.stopPropagation()}>
+        {filteredProjects.length > 0 ? (
+          <SidebarMenuSub className="list-none">
+            {filteredProjects.map((project) => (
+              <ContextMenu key={project.path}>
+                <ContextMenuTrigger>
+                  <SidebarMenuButton
+                    className="text-xs"
+                    onClick={() => props.onClick(project)}
+                    isActive={props.selectedProjectPath === project.path}
+                  >
+                    {project.name}
+                  </SidebarMenuButton>
+                </ContextMenuTrigger>
+                <ContextMenuContent>
+                  <ContextMenuItem
+                    onClick={() => handleRemoveFromGroup(project.path)}
+                  >
+                    Remove from group
+                  </ContextMenuItem>
+                </ContextMenuContent>
+              </ContextMenu>
+            ))}
+          </SidebarMenuSub>
+        ) : (
+          <div className="px-4 py-2 text-sm text-muted-foreground">
+            Drop projects here
+          </div>
+        )}
+      </div>
+    );
+  };
 
   return (
     <>
