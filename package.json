@@ -28,7 +28,11 @@
     "@radix-ui/react-slot": "^1.1.1",
     "@radix-ui/react-tabs": "^1.0.4",
     "@radix-ui/react-tooltip": "^1.1.7",
-    "@tauri-apps/api": "^1.5.1",
+    "@tauri-apps/api": "^2.3.0",
+    "@tauri-apps/plugin-dialog": "^2.2.0",
+    "@tauri-apps/plugin-fs": "^2.2.0",
+    "@tauri-apps/plugin-shell": "^2.2.0",
+    "@tauri-apps/plugin-sql": "^2.2.0",
     "@tauri-apps/tauricon": "^0.0.0",
     "@tiptap/extension-color": "^2.1.12",
     "@tiptap/extension-image": "^2.1.12",
@@ -62,7 +66,7 @@
     "xml2js": "^0.6.2"
   },
   "devDependencies": {
-    "@tauri-apps/cli": "^1.5.6",
+    "@tauri-apps/cli": "^2.3.1",
     "autoprefixer": "^10.4.16",
     "eslint": "^8",
     "eslint-config-next": "^15.0.3",

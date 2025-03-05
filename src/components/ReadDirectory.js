@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { open } from "@tauri-apps/api/dialog";
+import { open } from "@tauri-apps/plugin-dialog";
 import { MenubarItem } from "@/components/ui/menubar";
 import { useTranslation } from "react-i18next";
 

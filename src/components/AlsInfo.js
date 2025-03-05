@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 import { useEffect, useState } from "react";
 import _ from "lodash";
 import { findDeep } from "@/utils";
-import { readBinaryFile, writeTextFile } from "@tauri-apps/api/fs";
+import { readFile, writeTextFile } from "@tauri-apps/plugin-fs";
 import Ableton from "@/lib/Ableton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import TrackDetails from "@/components/TrackDetails";
@@ -122,7 +122,7 @@ const AlsInfo = ({
     const readProjectFile = async (file) => {
       // rest project file to display loading view
       setProjectObject(null);
-      const zipFileContent = await readBinaryFile(file);
+      const zipFileContent = await readFile(file);
       new Ableton().UnpackAndCreatJson(
         zipFileContent,
         (AbletonSet) => {

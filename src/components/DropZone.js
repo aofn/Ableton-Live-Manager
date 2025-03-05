@@ -7,7 +7,7 @@ import {
   DialogOverlay,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { open } from "@tauri-apps/api/dialog";
+import { open } from "@tauri-apps/plugin-dialog";
 
 const DropZone = ({ onFolderDrop }) => {
   const [isDragging, setIsDragging] = useState(false);
