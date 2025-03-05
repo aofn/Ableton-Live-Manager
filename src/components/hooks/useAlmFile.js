@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect } from "react";
-import { exists, readTextFile, writeTextFile } from "@tauri-apps/api/fs";
+import { exists, readTextFile, writeTextFile } from "@tauri-apps/plugin-fs";
 
 const DEFAULT_ALM_DATA = {
   notes: "",

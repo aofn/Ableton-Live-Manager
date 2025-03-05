@@ -13,7 +13,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { Checkbox } from "@/components/ui/checkbox";
-import { writeTextFile } from "@tauri-apps/api/fs";
+import { writeTextFile } from "@tauri-apps/plugin-fs";
 import { setConfig } from "next/config";
 import {
   Dialog,

@@ -1,7 +1,7 @@
 import xml2js from "xml2js";
 import pako from "pako";
 import * as xmlJs from "xml-js";
-import { readTextFile, readDir, exists } from "@tauri-apps/api/fs";
+import { readTextFile, readDir, exists } from "@tauri-apps/plugin-fs";
 
 class Ableton {
   UnpackAndCreatJson(xml, OnLoaded, OnError, Original) {
