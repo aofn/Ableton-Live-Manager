@@ -1,5 +1,6 @@
 import { useState, useCallback, useEffect } from "react";
 import { exists, readTextFile, writeTextFile } from "@tauri-apps/plugin-fs";
+import {createAppleNote} from "@/lib/appleNotes";
 
 const DEFAULT_ALM_DATA = {
   notes: "",
@@ -93,6 +94,13 @@ export function useAlmFile(projectPath) {
 
   const updateNotes = useCallback(
     async (notes) => {
+      // Create a new Apple Note with the updated notes
+
+      // extract title from path
+      const pathParts = projectPath.split("/");
+      const title = pathParts[pathParts.length - 1];
+
+      await createAppleNote(title, notes);
       return writeAlmFile({ notes });
     },
     [writeAlmFile],

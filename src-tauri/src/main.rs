@@ -1,14 +1,21 @@
 // Prevents additional console window on Windows in release, DO NOT REMOVE!!
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 use std::fs::metadata;
+mod apple_notes;
 
 fn main() {
     tauri::Builder::default()
+        .plugin(tauri_plugin_os::init())
         .plugin(tauri_plugin_sql::Builder::new().build())
         .plugin(tauri_plugin_fs::init())
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_shell::init())
-        .invoke_handler(tauri::generate_handler![greet, print_this, is_file,])
+        .invoke_handler(tauri::generate_handler![
+            greet,
+            print_this,
+            is_file,
+            apple_notes::create_apple_note,
+        ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
