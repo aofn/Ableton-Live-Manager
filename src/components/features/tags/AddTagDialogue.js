@@ -4,7 +4,7 @@
 }
 import { useTranslation } from "react-i18next";
 import { useState } from "react";
-import { BaseDirectory, writeTextFile } from "@tauri-apps/api/fs";
+import { BaseDirectory, writeTextFile } from "@tauri-apps/plugin-fs";
 import {
   Dialog,
   DialogContent,
