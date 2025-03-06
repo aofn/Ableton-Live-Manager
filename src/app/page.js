@@ -6,14 +6,14 @@ import {
   readDir,
   readTextFile,
   writeTextFile,
-} from "@tauri-apps/api/fs";
+} from "@tauri-apps/plugin-fs";
 import { Progress } from "@/components/ui/progress";
-import { invoke } from "@tauri-apps/api/tauri";
+import { invoke } from "@tauri-apps/api/core";
 import { useTranslation } from "react-i18next";
 import "remixicon/fonts/remixicon.css";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import AppSidebar from "@/components/layout/AppSidebar";
-import { open } from "@tauri-apps/api/shell";
+import { open } from "@tauri-apps/plugin-shell";
 import ProjectDetails from "@/components/layout/ProjectDetails";
 import { TouchBackend } from "react-dnd-touch-backend";
 import { DndProvider } from "react-dnd";
@@ -154,13 +154,26 @@ export default function Home() {
 
   useEffect(() => {
     const getConfig = async () => {
-      const configFile = await readTextFile("config.json", {
-        dir: BaseDirectory.Data,
-      });
+      try {
+        const configFile = await readTextFile("config.json", {
+          dir: BaseDirectory.Data,
+        });
 
-      if (configFile) {
-        const configJson = JSON.parse(configFile);
-        setConfig(configJson);
+        if (configFile) {
+          const configJson = JSON.parse(configFile);
+          setConfig(configJson);
+        }
+      } catch (error) {
+        console.log(JSON.stringify(error));
+        if (error.includes("No such file or directory")) {
+          const defaultConfig = { directories: [] };
+          await writeTextFile("config.json", JSON.stringify(defaultConfig, null, 2), {
+            dir: BaseDirectory.Data,
+          });
+          setConfig(defaultConfig);
+        } else {
+          console.error("Failed to read config file:", error);
+        }
       }
     };
 
@@ -176,18 +189,18 @@ export default function Home() {
       const folder = await readDir(folderPath, {
         recursive: true,
       });
-
+      console.log(folder);
       const folderObject = {
         name: folderPath.split("/").pop(),
         path: folderPath,
         children: folder.map((entry) => ({
-          name: entry.name,
-          path: entry.path,
+          ...entry,
+          path: folderPath + "/" + entry.name,
         })),
       };
-
+      console.log(folderObject)
       const containsAlsFile = folder.some((entry) =>
-        entry.path.endsWith(".als"),
+        entry.name.endsWith(".als"),
       );
 
       if (config.directories?.some((dir) => dir.path === folderPath)) {
