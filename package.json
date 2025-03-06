@@ -33,7 +33,6 @@
     "@tauri-apps/plugin-fs": "^2.2.0",
     "@tauri-apps/plugin-os": "^2.2.0",
     "@tauri-apps/plugin-shell": "^2.2.0",
-    "@tauri-apps/plugin-sql": "^2.2.0",
     "@tauri-apps/tauricon": "^0.0.0",
     "@tiptap/extension-color": "^2.1.12",
     "@tiptap/extension-image": "^2.1.12",

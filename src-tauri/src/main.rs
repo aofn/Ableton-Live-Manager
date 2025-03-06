@@ -6,7 +6,6 @@ mod apple_notes;
 fn main() {
     tauri::Builder::default()
         .plugin(tauri_plugin_os::init())
-        .plugin(tauri_plugin_sql::Builder::new().build())
         .plugin(tauri_plugin_fs::init())
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_shell::init())
@@ -14,7 +13,7 @@ fn main() {
             greet,
             print_this,
             is_file,
-            apple_notes::create_apple_note,
+           apple_notes::create_or_update_apple_note,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
